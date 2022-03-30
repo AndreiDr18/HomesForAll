@@ -1,4 +1,6 @@
-﻿using HomesForAll.DAL.Entities;
+﻿using HomesForAll.DAL;
+using HomesForAll.DAL.Entities;
+using HomesForAll.DAL.Models.Tenant;
 using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Utils.ServerResponse.Models.TenantModels;
 using Microsoft.AspNetCore.Http;
@@ -58,6 +60,47 @@ namespace HomesForAll.Services.TenantServices
                 {
                     Success = false,
                     Message = ex.Message
+                };
+            }
+            
+        }
+        public async Task<ResponseBase<EmptyBodyModel>> UpdateTenant(TenantUpdateModel model, string authToken)
+        {
+            try
+            {
+                string jwt;
+
+                if (AuthenticationHeaderValue.TryParse(authToken, out var header))
+                    jwt = header.Parameter;
+                else throw new Exception("Couldn't parse authorization token from header");
+
+
+                var tokenJSON = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
+
+                var id = tokenJSON.Claims.FirstOrDefault(cl => cl.Type == "UserId").Value;
+
+                var user = await _userManager.FindByIdAsync(id);
+
+                user.Name = model.Name;
+                user.PhoneNumber = model.PhoneNumber;
+                user.BirthDate = model.BirthDate;
+
+                var updateResult = await _userManager.UpdateAsync(user);
+
+                if (!updateResult.Succeeded)
+                    throw new Exception("User could not be updated");
+
+                return new ResponseBase<EmptyBodyModel>
+                {
+                    Success = true,
+                    Message = "User data succesfully updated"
+                };
+            }catch (Exception ex)
+            {
+                return new ResponseBase<EmptyBodyModel>
+                {
+                    Success = false,
+                    Message= ex.Message
                 };
             }
             

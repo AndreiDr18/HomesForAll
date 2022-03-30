@@ -7,11 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using HomesForAll.Utils.ServerResponse.Models.TenantModels;
 using Microsoft.AspNetCore.Http;
+using HomesForAll.DAL.Models.Tenant;
 
 namespace HomesForAll.Services.TenantServices
 {
     public interface ITenantService
     {
         public Task<ResponseBase<GetByIdBodyModel>> GetTenantInfo(string authToken);
+        public Task<ResponseBase<EmptyBodyModel>> UpdateTenant(TenantUpdateModel model, string authToken);
     }
 }

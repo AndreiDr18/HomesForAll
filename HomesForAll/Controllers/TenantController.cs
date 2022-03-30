@@ -32,6 +32,16 @@ namespace HomesForAll.Controllers
             return BadRequest(result);
         }
 
-            
+        [HttpPut]
+        [Authorize(Roles = Roles.Tenant)]
+        public async Task<ActionResult<ResponseBase<EmptyBodyModel>>> UpdateTenant([FromBody] TenantUpdateModel model, [FromHeader] string authorization)
+        {
+            var result = await _tenantService.UpdateTenant(model, authorization);
+
+            if (result.Success) return Ok(result);
+            return BadRequest(result); 
+
+        }
+
     }
 }
