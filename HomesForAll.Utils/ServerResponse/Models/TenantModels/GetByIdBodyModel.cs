@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomesForAll.DAL.Models.Tenant
+namespace HomesForAll.Utils.ServerResponse.Models.TenantModels
 {
-    public class TenantRegisterModel
+    public class GetByIdBodyModel
     {
         public string Name { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public string Username { get; set; }
     }
 }

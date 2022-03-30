@@ -11,11 +11,9 @@ namespace HomesForAll.DAL.Entities
     public class User : IdentityUser
     {
         public string Name { get; set; }
+        public string PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }
-        public DateTime JoinedAt {
-            get { return DateTime.Now; }
-            set { JoinedAt = value; }
-        }
+        public DateTime JoinedAtDate { get; set; }
         //LandLord access level
         public ICollection<Property>? Properties { get; set; }
 

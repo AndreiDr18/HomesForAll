@@ -10,6 +10,7 @@ namespace HomesForAll.DAL.Entities
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Address { get; set; }
         public int AvailableSpaces { get; set; }
         public DateTime AddedAt { get; set; }
         public User LandLord { get; set; }

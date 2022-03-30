@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.DAL.UserRoles
 {
-    internal class Roles
+    public class Roles
     {
         public const string Tenant = "Tenant";
         public const string Landlord = "Landlord";
+
     }
 }

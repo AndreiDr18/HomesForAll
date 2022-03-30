@@ -1,78 +1,66 @@
-﻿using System;
+﻿using HomesForAll.DAL.Entities;
+using HomesForAll.Utils.ServerResponse;
+using HomesForAll.Utils.ServerResponse.Models.TenantModels;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using HomesForAll.DAL;
-using HomesForAll.DAL.Models.Tenant;
-using HomesForAll.DAL.Entities;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using HomesForAll.Utils.ServerResponse;
-using HomesForAll.Utils.ServerResponse.Models;
 
 namespace HomesForAll.Services.TenantServices
 {
     public class TenantService : ITenantService
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IConfiguration _configuration;
 
-        public TenantService(
-            UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration)
+        public TenantService(UserManager<User> userManager)
         {
-            this._userManager = userManager;
-            this._roleManager = roleManager;
-            this._configuration = configuration;
+            _userManager = userManager;
         }
-        
-        public async Task<ResponseBase<TenantRegistrationBodyModel>> RegisterTenant(TenantRegisterModel model)
+        public async Task<ResponseBase<GetByIdBodyModel>> GetTenantInfo(string authToken)
         {
             try
             {
-                var userExists = await _userManager.FindByNameAsync(model.Username);
-                
-                
-                if (userExists != null)
-                    throw new Exception("User already exists");
+                string jwt;
+
+                if (AuthenticationHeaderValue.TryParse(authToken, out var header))
+                    jwt = header.Parameter;
+                else throw new Exception("Couldn't parse authorization token from header");
 
 
-                User user = new User()
-                {
-                    Name = model.Name,
-                    UserName = model.Username,
-                    SecurityStamp = Guid.NewGuid().ToString(),
-                    Email = model.Email
-                };
+                var tokenJSON = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
 
-                var res = await _userManager.CreateAsync(user, model.Password);
-                _userManager.Dispose();
+                var id = tokenJSON.Claims.FirstOrDefault(cl => cl.Type == "UserId").Value;
 
-                if (!res.Succeeded) throw new Exception($"User could not be created: {res.Errors.ToArray().ToString()}");
+                var user = await _userManager.FindByIdAsync(id);
 
-                return new ResponseBase<TenantRegistrationBodyModel>()
+                return new ResponseBase<GetByIdBodyModel>
                 {
                     Success = true,
-                    Message = "User created succesfully",
-                    Body = new TenantRegistrationBodyModel
+                    Message = "User information succesfully retrieved",
+                    Body = new GetByIdBodyModel
                     {
-                        token = "Test",
-                        Username = model.Username
+                        Name = user.Name,
+                        PhoneNumber = user.PhoneNumber,
+                        DateOfBirth = user.BirthDate,
+                        Username = user.UserName
                     }
-            };
+                };
+
             }
             catch (Exception ex)
             {
-                return new ResponseBase<TenantRegistrationBodyModel>()
+                return new ResponseBase<GetByIdBodyModel>
                 {
                     Success = false,
                     Message = ex.Message
                 };
             }
+            
         }
     }
 }

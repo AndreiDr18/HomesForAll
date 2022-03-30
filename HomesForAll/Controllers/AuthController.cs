@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using HomesForAll.DAL.Models.Tenant;
+using HomesForAll.DAL.Models.Authentication;
 using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Utils.ServerResponse.Models;
-using HomesForAll.Services.TenantServices;
+using HomesForAll.Services.AuthenticationServices;
 
 namespace HomesForAll.Controllers
 {
@@ -12,21 +12,31 @@ namespace HomesForAll.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private ITenantService _tenantService;
+        private IAuthenticationService _authenticationService;
 
-        public AuthController(ITenantService tenantService)
+        public AuthController(IAuthenticationService authenticationService)
         {
-            _tenantService = tenantService;
+            _authenticationService = authenticationService;
         }
-        [HttpPost("tenant/register")]
+        [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseBase<TenantRegistrationBodyModel>>> Register([FromBody]TenantRegisterModel model)
+        public async Task<ActionResult<ResponseBase<AuthenticationBodyModel>>> Register([FromBody]RegistrationModel model)
         {
-            var result = await _tenantService.RegisterTenant(model);
+            var result = await _authenticationService.Register(model);
 
             if(result.Success) return Ok(result);
             return BadRequest(result);
 
+        }
+
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ResponseBase<AuthenticationBodyModel>>> Login([FromBody] LoginModel model)
+        {
+            var result = await _authenticationService.Login(model);
+
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
 
         }
     }
