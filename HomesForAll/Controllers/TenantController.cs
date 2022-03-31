@@ -21,9 +21,9 @@ namespace HomesForAll.Controllers
             _tenantService = tenantService;
         }
         
-        [HttpGet("getCurrentUserInfo")]
+        [HttpGet]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<GetByIdBodyModel>>> Get([FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<GetByIdResponseModel>>> Get([FromHeader] string authorization)
         {
             
             var result = await _tenantService.GetTenantInfo(authorization);
@@ -34,7 +34,7 @@ namespace HomesForAll.Controllers
 
         [HttpPut]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<EmptyBodyModel>>> UpdateTenant([FromBody] TenantUpdateModel model, [FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> UpdateTenant([FromBody] TenantUpdateModel model, [FromHeader] string authorization)
         {
             var result = await _tenantService.UpdateTenant(model, authorization);
 
@@ -42,6 +42,5 @@ namespace HomesForAll.Controllers
             return BadRequest(result); 
 
         }
-
     }
 }

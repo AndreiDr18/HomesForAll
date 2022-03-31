@@ -1,6 +1,7 @@
 ﻿using HomesForAll.DAL;
 using HomesForAll.DAL.Entities;
 using HomesForAll.DAL.Models.Tenant;
+using HomesForAll.Utils.JWT;
 using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Utils.ServerResponse.Models.TenantModels;
 using Microsoft.AspNetCore.Http;
@@ -23,28 +24,19 @@ namespace HomesForAll.Services.TenantServices
         {
             _userManager = userManager;
         }
-        public async Task<ResponseBase<GetByIdBodyModel>> GetTenantInfo(string authToken)
+        public async Task<ResponseBase<GetByIdResponseModel>> GetTenantInfo(string authToken)
         {
             try
             {
-                string jwt;
-
-                if (AuthenticationHeaderValue.TryParse(authToken, out var header))
-                    jwt = header.Parameter;
-                else throw new Exception("Couldn't parse authorization token from header");
-
-
-                var tokenJSON = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
-
-                var id = tokenJSON.Claims.FirstOrDefault(cl => cl.Type == "UserId").Value;
+                var id = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
 
                 var user = await _userManager.FindByIdAsync(id);
 
-                return new ResponseBase<GetByIdBodyModel>
+                return new ResponseBase<GetByIdResponseModel>
                 {
                     Success = true,
                     Message = "User information succesfully retrieved",
-                    Body = new GetByIdBodyModel
+                    Body = new GetByIdResponseModel
                     {
                         Name = user.Name,
                         PhoneNumber = user.PhoneNumber,
@@ -56,7 +48,7 @@ namespace HomesForAll.Services.TenantServices
             }
             catch (Exception ex)
             {
-                return new ResponseBase<GetByIdBodyModel>
+                return new ResponseBase<GetByIdResponseModel>
                 {
                     Success = false,
                     Message = ex.Message
@@ -64,20 +56,12 @@ namespace HomesForAll.Services.TenantServices
             }
             
         }
-        public async Task<ResponseBase<EmptyBodyModel>> UpdateTenant(TenantUpdateModel model, string authToken)
+        public async Task<ResponseBase<EmptyResponseModel>> UpdateTenant(TenantUpdateModel model, string authToken)
         {
             try
             {
-                string jwt;
 
-                if (AuthenticationHeaderValue.TryParse(authToken, out var header))
-                    jwt = header.Parameter;
-                else throw new Exception("Couldn't parse authorization token from header");
-
-
-                var tokenJSON = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
-
-                var id = tokenJSON.Claims.FirstOrDefault(cl => cl.Type == "UserId").Value;
+                var id = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
 
                 var user = await _userManager.FindByIdAsync(id);
 
@@ -90,14 +74,14 @@ namespace HomesForAll.Services.TenantServices
                 if (!updateResult.Succeeded)
                     throw new Exception("User could not be updated");
 
-                return new ResponseBase<EmptyBodyModel>
+                return new ResponseBase<EmptyResponseModel>
                 {
                     Success = true,
                     Message = "User data succesfully updated"
                 };
             }catch (Exception ex)
             {
-                return new ResponseBase<EmptyBodyModel>
+                return new ResponseBase<EmptyResponseModel>
                 {
                     Success = false,
                     Message= ex.Message

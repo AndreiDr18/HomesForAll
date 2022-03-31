@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomesForAll.Utils.ServerResponse.Models
+namespace HomesForAll.Utils.ServerResponse.Models.TenantModels
 {
-    public class AuthenticationBodyModel
+    public class EmptyResponseModel
     {
-        public string token { get; set; }
     }
 }

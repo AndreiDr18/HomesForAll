@@ -3,10 +3,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 using System.Text;
+using System.Net.Http.Headers;
 
-namespace HomesForAll.JWT
+namespace HomesForAll.Utils.JWT
 {
-    public class TokenCreator
+    public class TokenManager
     {
         
 
@@ -22,6 +23,20 @@ namespace HomesForAll.JWT
                 signingCredentials: new SigningCredentials(signKey, SecurityAlgorithms.HmacSha256)
                 );
             return token;
+        }
+
+        static public string ExtractHeaderValueJWT(string authToken, string claimType)
+        {
+            string jwt;
+
+            if (AuthenticationHeaderValue.TryParse(authToken, out var header))
+                jwt = header.Parameter;
+            else throw new Exception("Couldn't parse authorization token from header");
+
+
+            var tokenJSON = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
+
+            return tokenJSON.Claims.FirstOrDefault(cl => cl.Type == $"{claimType}").Value;
         }
     }
 }

@@ -5,7 +5,7 @@ using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Utils.ServerResponse.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using HomesForAll.JWT;
+using HomesForAll.Utils.JWT;
 using HomesForAll.DAL.Models.Authentication;
 
 namespace HomesForAll.Services.AuthenticationServices
@@ -26,7 +26,7 @@ namespace HomesForAll.Services.AuthenticationServices
             this._configuration = configuration;
         }
         
-        public async Task<ResponseBase<AuthenticationBodyModel>> Register(RegistrationModel model)
+        public async Task<ResponseBase<AuthenticationResponseModel>> Register(RegistrationModel model)
         {
             try
             {
@@ -72,13 +72,13 @@ namespace HomesForAll.Services.AuthenticationServices
                     new Claim("UserId", user.Id)
                 };
                 
-                var token = TokenCreator.CreateToken(authClaims, _configuration);
+                var token = TokenManager.CreateToken(authClaims, _configuration);
 
-                return new ResponseBase<AuthenticationBodyModel>()
+                return new ResponseBase<AuthenticationResponseModel>()
                 {
                     Success = true,
                     Message = "User created succesfully",
-                    Body = new AuthenticationBodyModel
+                    Body = new AuthenticationResponseModel
                     {
                         token = new JwtSecurityTokenHandler().WriteToken(token)
                         
@@ -87,14 +87,14 @@ namespace HomesForAll.Services.AuthenticationServices
             }
             catch (Exception ex)
             {
-                return new ResponseBase<AuthenticationBodyModel>()
+                return new ResponseBase<AuthenticationResponseModel>()
                 {
                     Success = false,
                     Message = ex.Message
                 };
             }
         }
-        public async Task<ResponseBase<AuthenticationBodyModel>> Login(LoginModel model)
+        public async Task<ResponseBase<AuthenticationResponseModel>> Login(LoginModel model)
         {
             
             try
@@ -119,13 +119,13 @@ namespace HomesForAll.Services.AuthenticationServices
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
-                var token = TokenCreator.CreateToken(authClaims, _configuration);
+                var token = TokenManager.CreateToken(authClaims, _configuration);
 
-                return new ResponseBase<AuthenticationBodyModel>
+                return new ResponseBase<AuthenticationResponseModel>
                 {
                     Success = true,
                     Message = "Logged in succesfully",
-                    Body = new AuthenticationBodyModel
+                    Body = new AuthenticationResponseModel
                     {
                         token = new JwtSecurityTokenHandler().WriteToken(token)
                     }
@@ -135,7 +135,7 @@ namespace HomesForAll.Services.AuthenticationServices
             }
             catch(Exception ex)
             {
-                return new ResponseBase<AuthenticationBodyModel>
+                return new ResponseBase<AuthenticationResponseModel>
                 {
                     Success= false,
                     Message= ex.Message

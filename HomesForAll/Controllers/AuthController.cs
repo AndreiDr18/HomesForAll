@@ -20,7 +20,7 @@ namespace HomesForAll.Controllers
         }
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseBase<AuthenticationBodyModel>>> Register([FromBody]RegistrationModel model)
+        public async Task<ActionResult<ResponseBase<AuthenticationResponseModel>>> Register([FromBody]RegistrationModel model)
         {
             var result = await _authenticationService.Register(model);
 
@@ -31,7 +31,7 @@ namespace HomesForAll.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseBase<AuthenticationBodyModel>>> Login([FromBody] LoginModel model)
+        public async Task<ActionResult<ResponseBase<AuthenticationResponseModel>>> Login([FromBody] LoginModel model)
         {
             var result = await _authenticationService.Login(model);
 

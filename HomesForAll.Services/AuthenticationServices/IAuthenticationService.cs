@@ -11,7 +11,7 @@ namespace HomesForAll.Services.AuthenticationServices
 {
     public interface IAuthenticationService
     {
-        public Task<ResponseBase<AuthenticationBodyModel>> Register(RegistrationModel model);
-        public Task<ResponseBase<AuthenticationBodyModel>> Login(LoginModel model);
+        public Task<ResponseBase<AuthenticationResponseModel>> Register(RegistrationModel model);
+        public Task<ResponseBase<AuthenticationResponseModel>> Login(LoginModel model);
     }
 }

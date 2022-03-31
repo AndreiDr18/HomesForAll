@@ -13,7 +13,7 @@ namespace HomesForAll.Services.TenantServices
 {
     public interface ITenantService
     {
-        public Task<ResponseBase<GetByIdBodyModel>> GetTenantInfo(string authToken);
-        public Task<ResponseBase<EmptyBodyModel>> UpdateTenant(TenantUpdateModel model, string authToken);
+        public Task<ResponseBase<GetByIdResponseModel>> GetTenantInfo(string authToken);
+        public Task<ResponseBase<EmptyResponseModel>> UpdateTenant(TenantUpdateModel model, string authToken);
     }
 }
