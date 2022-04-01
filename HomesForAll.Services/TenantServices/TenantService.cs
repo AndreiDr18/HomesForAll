@@ -4,6 +4,7 @@ using HomesForAll.DAL.Models.Tenant;
 using HomesForAll.Utils.JWT;
 using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Utils.ServerResponse.Models.TenantModels;
+using HomesForAll.Utils.ServerResponse.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;

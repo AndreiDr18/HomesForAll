@@ -17,7 +17,7 @@ namespace HomesForAll.DAL.Entities
         public string LandLordID { get; set; }
         
         public ICollection<User>? AcceptedTenants { get; set; }
-        public ICollection<User>? RequestingTenants { get; set; }
+        public ICollection<TenantRequest>? TenantRequests { get; set; }
 
     }
 }

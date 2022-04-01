@@ -14,11 +14,12 @@ namespace HomesForAll.DAL.Entities
         public string PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime JoinedAtDate { get; set; }
-        //LandLord access level
+        //LandLord role
         public ICollection<Property>? Properties { get; set; }
 
-        //Tenant access level
+        //Tenant role
         public Property? AcceptedAtProperty { get; set; }
-        public ICollection<Property>? RequestedProperties { get; set; }
+        public string? AcceptedAtPropertyID { get; set; }
+        public ICollection<TenantRequest>? PropertyRequests { get; set; }
     }
 }

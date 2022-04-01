@@ -4,6 +4,7 @@ using HomesForAll.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomesForAll.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220331222920_TenantID-PropertyID2")]
+    partial class TenantIDPropertyID2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,7 +88,7 @@ namespace HomesForAll.DAL.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AcceptedAtPropertyID")
+                    b.Property<string>("AcceptedAtPropertyId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
@@ -149,7 +151,7 @@ namespace HomesForAll.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AcceptedAtPropertyID");
+                    b.HasIndex("AcceptedAtPropertyId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -329,7 +331,7 @@ namespace HomesForAll.DAL.Migrations
                 {
                     b.HasOne("HomesForAll.DAL.Entities.Property", "AcceptedAtProperty")
                         .WithMany("AcceptedTenants")
-                        .HasForeignKey("AcceptedAtPropertyID")
+                        .HasForeignKey("AcceptedAtPropertyId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("AcceptedAtProperty");

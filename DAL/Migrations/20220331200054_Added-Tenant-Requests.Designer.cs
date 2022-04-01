@@ -4,6 +4,7 @@ using HomesForAll.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomesForAll.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220331200054_Added-Tenant-Requests")]
+    partial class AddedTenantRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,19 +66,7 @@ namespace HomesForAll.DAL.Migrations
                     b.Property<int>("NumberOfPeople")
                         .HasColumnType("int");
 
-                    b.Property<string>("PropertyID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("TenantID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PropertyID");
-
-                    b.HasIndex("TenantID");
 
                     b.ToTable("TenantRequests");
                 });
@@ -86,7 +76,7 @@ namespace HomesForAll.DAL.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AcceptedAtPropertyID")
+                    b.Property<string>("AcceptedAtPropertyId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
@@ -149,7 +139,7 @@ namespace HomesForAll.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AcceptedAtPropertyID");
+                    b.HasIndex("AcceptedAtPropertyId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -310,13 +300,13 @@ namespace HomesForAll.DAL.Migrations
                 {
                     b.HasOne("HomesForAll.DAL.Entities.Property", "Property")
                         .WithMany("TenantRequests")
-                        .HasForeignKey("PropertyID")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HomesForAll.DAL.Entities.User", "Tenant")
                         .WithMany("PropertyRequests")
-                        .HasForeignKey("TenantID")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -329,7 +319,7 @@ namespace HomesForAll.DAL.Migrations
                 {
                     b.HasOne("HomesForAll.DAL.Entities.Property", "AcceptedAtProperty")
                         .WithMany("AcceptedTenants")
-                        .HasForeignKey("AcceptedAtPropertyID")
+                        .HasForeignKey("AcceptedAtPropertyId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("AcceptedAtProperty");

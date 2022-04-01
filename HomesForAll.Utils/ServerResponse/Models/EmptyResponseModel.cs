@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomesForAll.Utils.ServerResponse.Models.TenantModels
+namespace HomesForAll.Utils.ServerResponse.Models
 {
     public class EmptyResponseModel
     {

@@ -6,6 +6,7 @@ using HomesForAll.DAL.Models.Tenant;
 using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Services.TenantServices;
 using HomesForAll.Utils.ServerResponse.Models.TenantModels;
+using HomesForAll.Utils.ServerResponse.Models;
 
 namespace HomesForAll.Controllers
 {
