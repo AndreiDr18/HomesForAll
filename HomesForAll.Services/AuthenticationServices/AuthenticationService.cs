@@ -13,12 +13,12 @@ namespace HomesForAll.Services.AuthenticationServices
     public class AuthenticationService : IAuthenticationService
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
 
         public AuthenticationService(
             UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<IdentityRole<Guid>> roleManager,
             IConfiguration configuration)
         {
             this._userManager = userManager;
@@ -69,7 +69,7 @@ namespace HomesForAll.Services.AuthenticationServices
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(ClaimTypes.Role, model.Role),
-                    new Claim("UserId", user.Id)
+                    new Claim("UserId", user.Id.ToString())
                 };
                 
                 var token = TokenManager.CreateToken(authClaims, _configuration);
@@ -110,7 +110,7 @@ namespace HomesForAll.Services.AuthenticationServices
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim("UserId", user.Id)
+                    new Claim("UserId", user.Id.ToString())
                 };
 
                 //Iterable for scalable design

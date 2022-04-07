@@ -6,14 +6,21 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.DAL.Entities
 {
-    public class TenantRequest
+    public class TenantRequest : BaseEntity.BaseEntity
     {
-        public string Id { get; set; }
         public int NumberOfPeople { get; set; }
         public string Message { get; set; }
+        public Status Status { get; set; }
         public User Tenant { get; set; }
-        public string TenantID { get; set; }
+        public Guid TenantID { get; set; }
         public Property Property { get; set; }
-        public string PropertyID { get; set; }
+        public Guid PropertyID { get; set; }
+    }
+
+    public enum Status
+    {
+        Pending,
+        Rejected,
+        Accepted
     }
 }

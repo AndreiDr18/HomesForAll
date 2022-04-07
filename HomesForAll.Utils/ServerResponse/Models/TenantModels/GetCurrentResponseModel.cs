@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.Utils.ServerResponse.Models.TenantModels
 {
-    public class GetByIdResponseModel
+    public class GetCurrentResponseModel
     {
         public string Name { get; set; }
         public string PhoneNumber { get; set; }

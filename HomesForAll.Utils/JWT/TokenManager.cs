@@ -11,7 +11,7 @@ namespace HomesForAll.Utils.JWT
     {
         
 
-        static public JwtSecurityToken CreateToken(List<Claim> authClaims, IConfiguration _configuration)
+        static public JwtSecurityToken CreateToken(in List<Claim> authClaims,in IConfiguration _configuration)
         {
             var signKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
 
@@ -25,7 +25,7 @@ namespace HomesForAll.Utils.JWT
             return token;
         }
 
-        static public string ExtractHeaderValueJWT(string authToken, string claimType)
+        static public string ExtractHeaderValueJWT(in string authToken, string claimType)
         {
             string jwt;
 

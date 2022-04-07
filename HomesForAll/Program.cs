@@ -26,7 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b=> b.MigrationsAssembly("HomesForAll.DAL"))
 );
 
-builder.Services.AddIdentity<User, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 

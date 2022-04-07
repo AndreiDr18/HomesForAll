@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HomesForAll.DAL.Entities;
 
-namespace HomesForAll.DAL.Models.Property
+namespace HomesForAll.DAL.Models.Tenant
 {
     public class RequestPropertyModel
     {
-        public string PropertyId { get; set; }
+        public Guid PropertyId { get; set; }
         public int NumberOfPeople { get; set; }
         public string Message { get; set; }
     }

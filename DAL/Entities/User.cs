@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.DAL.Entities
 {
-    public class User : IdentityUser
+    public class User : IdentityUser<Guid>
     {
         public string Name { get; set; }
-        public string PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime JoinedAtDate { get; set; }
         //LandLord role
@@ -19,7 +18,7 @@ namespace HomesForAll.DAL.Entities
 
         //Tenant role
         public Property? AcceptedAtProperty { get; set; }
-        public string? AcceptedAtPropertyID { get; set; }
+        public Guid? AcceptedAtPropertyID { get; set; }
         public ICollection<TenantRequest>? PropertyRequests { get; set; }
     }
 }

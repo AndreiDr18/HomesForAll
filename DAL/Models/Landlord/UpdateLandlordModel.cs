@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomesForAll.Utils.ServerResponse.Models.PropertyModels
+namespace HomesForAll.DAL.Models.Landlord
 {
-    public class RegisterPropertyResponseModel
+    public class UpdateLandlordModel
     {
         public string Name { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime BirthDate { get; set; }
     }
 }

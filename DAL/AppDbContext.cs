@@ -2,10 +2,12 @@
 using HomesForAll.DAL.Entities;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using HomesForAll.DAL.UserRoles;
 
 namespace HomesForAll.DAL
 {
-    public class AppDbContext : IdentityDbContext<User>
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
 
@@ -40,7 +42,10 @@ namespace HomesForAll.DAL
                 .WithMany(p => p.TenantRequests)
                 .HasForeignKey(tr => tr.PropertyID);
 
+            
+
             base.OnModelCreating(builder);
+
         }
         
         public override DbSet<User>? Users { get; set; }

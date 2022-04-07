@@ -22,9 +22,9 @@ namespace HomesForAll.Controllers
             _tenantService = tenantService;
         }
         
-        [HttpGet]
+        [HttpGet("getCurrent")]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<GetByIdResponseModel>>> Get([FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<GetCurrentResponseModel>>> Get([FromHeader] string authorization)
         {
             
             var result = await _tenantService.GetTenantInfo(authorization);
@@ -33,7 +33,7 @@ namespace HomesForAll.Controllers
             return BadRequest(result);
         }
 
-        [HttpPut]
+        [HttpPut("updateCurrent")]
         [Authorize(Roles = Roles.Tenant)]
         public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> UpdateTenant([FromBody] TenantUpdateModel model, [FromHeader] string authorization)
         {
@@ -42,6 +42,32 @@ namespace HomesForAll.Controllers
             if (result.Success) return Ok(result);
             return BadRequest(result); 
 
+        }
+        [HttpPost("requestProperty")]
+        [Authorize(Roles = Roles.Tenant)]
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> RequestProperty([FromBody] RequestPropertyModel model, [FromHeader] string authorization)
+        {
+            var result = await _tenantService.RequestProperty(model, authorization);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpGet("getCurrentRequests")]
+        [Authorize(Roles = Roles.Tenant)]
+        public async Task<ActionResult<ResponseBase<List<GetPropertyRequestResponseModel>>>> GetTenantRequests([FromHeader] string authorization)
+        {
+            var result = await _tenantService.GetTenantRequests(authorization);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpDelete("removeRequest/{reqId}")]
+        [Authorize(Roles = Roles.Tenant)]
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> DeleteRequest([FromHeader] string authorization, [FromRoute] string reqId)
+        {
+            var result = await _tenantService.DeleteRequest(authorization, reqId);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace HomesForAll.DAL.UserRoles
             try
             {
 
-                var _roleManager = _scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var _roleManager = _scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
                 var roles = typeof(Roles).GetFields();
 
@@ -40,9 +40,9 @@ namespace HomesForAll.DAL.UserRoles
 
         }
 
-        private static async Task CreateRoleAsync(string roleName, RoleManager<IdentityRole> _roleManager)
+        private static async Task CreateRoleAsync(string roleName, RoleManager<IdentityRole<Guid>> _roleManager)
         {
-            var roleToCreate = new IdentityRole(roleName);
+            var roleToCreate = new IdentityRole<Guid>(roleName);
             var result = await _roleManager.CreateAsync(roleToCreate);
             if (!result.Succeeded)
             {

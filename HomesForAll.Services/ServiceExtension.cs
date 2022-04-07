@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HomesForAll.Services.AuthenticationServices;
 using HomesForAll.Services.TenantServices;
 using HomesForAll.Services.PropertyServices;
+using HomesForAll.Services.LandlordServices;
 
 namespace HomesForAll.Services
 {
@@ -14,6 +15,7 @@ namespace HomesForAll.Services
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<ITenantService, TenantService>();
             services.AddTransient<IPropertyService, PropertyService>();
+            services.AddTransient<ILandlordService, LandlordService>();
         }
     }
 }

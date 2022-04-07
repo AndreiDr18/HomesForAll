@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomesForAll.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220326210317_Init")]
-    partial class Init
+    [Migration("20220401235804_tenantRequest-StatusEnum")]
+    partial class tenantRequestStatusEnum
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,18 +26,22 @@ namespace HomesForAll.DAL.Migrations
 
             modelBuilder.Entity("HomesForAll.DAL.Entities.Property", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AddedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("AvailableSpaces")
                         .HasColumnType("int");
 
-                    b.Property<string>("LandLordID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("LandLordID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -50,13 +54,45 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("Properties");
                 });
 
+            modelBuilder.Entity("HomesForAll.DAL.Entities.TenantRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfPeople")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PropertyID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TenantID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyID");
+
+                    b.HasIndex("TenantID");
+
+                    b.ToTable("TenantRequests");
+                });
+
             modelBuilder.Entity("HomesForAll.DAL.Entities.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AcceptedAtPropertyId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("AcceptedAtPropertyID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -75,7 +111,7 @@ namespace HomesForAll.DAL.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("JoinedAt")
+                    b.Property<DateTime>("JoinedAtDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
@@ -100,6 +136,7 @@ namespace HomesForAll.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
@@ -117,7 +154,7 @@ namespace HomesForAll.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AcceptedAtPropertyId");
+                    b.HasIndex("AcceptedAtPropertyID");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -130,10 +167,11 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -157,7 +195,7 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -171,9 +209,8 @@ namespace HomesForAll.DAL.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -182,7 +219,7 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -196,9 +233,8 @@ namespace HomesForAll.DAL.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -207,7 +243,7 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -218,9 +254,8 @@ namespace HomesForAll.DAL.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -229,13 +264,13 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -244,10 +279,10 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -263,21 +298,6 @@ namespace HomesForAll.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PropertyUser", b =>
-                {
-                    b.Property<string>("RequestedPropertiesId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RequestingTenantsId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("RequestedPropertiesId", "RequestingTenantsId");
-
-                    b.HasIndex("RequestingTenantsId");
-
-                    b.ToTable("PropertyUser");
-                });
-
             modelBuilder.Entity("HomesForAll.DAL.Entities.Property", b =>
                 {
                     b.HasOne("HomesForAll.DAL.Entities.User", "LandLord")
@@ -289,26 +309,45 @@ namespace HomesForAll.DAL.Migrations
                     b.Navigation("LandLord");
                 });
 
+            modelBuilder.Entity("HomesForAll.DAL.Entities.TenantRequest", b =>
+                {
+                    b.HasOne("HomesForAll.DAL.Entities.Property", "Property")
+                        .WithMany("TenantRequests")
+                        .HasForeignKey("PropertyID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomesForAll.DAL.Entities.User", "Tenant")
+                        .WithMany("PropertyRequests")
+                        .HasForeignKey("TenantID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("HomesForAll.DAL.Entities.User", b =>
                 {
                     b.HasOne("HomesForAll.DAL.Entities.Property", "AcceptedAtProperty")
                         .WithMany("AcceptedTenants")
-                        .HasForeignKey("AcceptedAtPropertyId")
+                        .HasForeignKey("AcceptedAtPropertyID")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("AcceptedAtProperty");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("HomesForAll.DAL.Entities.User", null)
                         .WithMany()
@@ -317,7 +356,7 @@ namespace HomesForAll.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("HomesForAll.DAL.Entities.User", null)
                         .WithMany()
@@ -326,9 +365,9 @@ namespace HomesForAll.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -341,26 +380,11 @@ namespace HomesForAll.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("HomesForAll.DAL.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("PropertyUser", b =>
-                {
-                    b.HasOne("HomesForAll.DAL.Entities.Property", null)
-                        .WithMany()
-                        .HasForeignKey("RequestedPropertiesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HomesForAll.DAL.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("RequestingTenantsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -368,11 +392,15 @@ namespace HomesForAll.DAL.Migrations
             modelBuilder.Entity("HomesForAll.DAL.Entities.Property", b =>
                 {
                     b.Navigation("AcceptedTenants");
+
+                    b.Navigation("TenantRequests");
                 });
 
             modelBuilder.Entity("HomesForAll.DAL.Entities.User", b =>
                 {
                     b.Navigation("Properties");
+
+                    b.Navigation("PropertyRequests");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.DAL.Entities
 {
-    public class Property
+    public class Property : BaseEntity.BaseEntity
     {
-        public string Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public int AvailableSpaces { get; set; }
         public DateTime AddedAt { get; set; }
         public User LandLord { get; set; }
-        public string LandLordID { get; set; }
+        public Guid LandLordID { get; set; }
         
         public ICollection<User>? AcceptedTenants { get; set; }
         public ICollection<TenantRequest>? TenantRequests { get; set; }

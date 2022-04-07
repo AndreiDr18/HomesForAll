@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace HomesForAll.DAL.Migrations
 {
-    public partial class Init : Migration
+    public partial class StringGuid : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,7 +13,7 @@ namespace HomesForAll.DAL.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -29,7 +29,7 @@ namespace HomesForAll.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -50,7 +50,7 @@ namespace HomesForAll.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -66,7 +66,7 @@ namespace HomesForAll.DAL.Migrations
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,8 +77,8 @@ namespace HomesForAll.DAL.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,11 +95,12 @@ namespace HomesForAll.DAL.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    JoinedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AcceptedAtPropertyId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    JoinedAtDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AcceptedAtPropertyID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -108,7 +109,6 @@ namespace HomesForAll.DAL.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -124,7 +124,7 @@ namespace HomesForAll.DAL.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -144,11 +144,12 @@ namespace HomesForAll.DAL.Migrations
                 name: "Properties",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AvailableSpaces = table.Column<int>(type: "int", nullable: false),
                     AddedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LandLordID = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    LandLordID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -161,24 +162,27 @@ namespace HomesForAll.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PropertyUser",
+                name: "TenantRequests",
                 columns: table => new
                 {
-                    RequestedPropertiesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RequestingTenantsId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NumberOfPeople = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TenantID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PropertyID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PropertyUser", x => new { x.RequestedPropertiesId, x.RequestingTenantsId });
+                    table.PrimaryKey("PK_TenantRequests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PropertyUser_AspNetUsers_RequestingTenantsId",
-                        column: x => x.RequestingTenantsId,
+                        name: "FK_TenantRequests_AspNetUsers_TenantID",
+                        column: x => x.TenantID,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PropertyUser_Properties_RequestedPropertiesId",
-                        column: x => x.RequestedPropertiesId,
+                        name: "FK_TenantRequests_Properties_PropertyID",
+                        column: x => x.PropertyID,
                         principalTable: "Properties",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -217,9 +221,9 @@ namespace HomesForAll.DAL.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_AcceptedAtPropertyId",
+                name: "IX_AspNetUsers_AcceptedAtPropertyID",
                 table: "AspNetUsers",
-                column: "AcceptedAtPropertyId");
+                column: "AcceptedAtPropertyID");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -234,9 +238,14 @@ namespace HomesForAll.DAL.Migrations
                 column: "LandLordID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PropertyUser_RequestingTenantsId",
-                table: "PropertyUser",
-                column: "RequestingTenantsId");
+                name: "IX_TenantRequests_PropertyID",
+                table: "TenantRequests",
+                column: "PropertyID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TenantRequests_TenantID",
+                table: "TenantRequests",
+                column: "TenantID");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUserClaims_AspNetUsers_UserId",
@@ -263,9 +272,9 @@ namespace HomesForAll.DAL.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_Properties_AcceptedAtPropertyId",
+                name: "FK_AspNetUsers_Properties_AcceptedAtPropertyID",
                 table: "AspNetUsers",
-                column: "AcceptedAtPropertyId",
+                column: "AcceptedAtPropertyID",
                 principalTable: "Properties",
                 principalColumn: "Id");
         }
@@ -292,7 +301,7 @@ namespace HomesForAll.DAL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "PropertyUser");
+                name: "TenantRequests");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

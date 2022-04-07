@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomesForAll.Utils.ServerResponse.Models.PropertyModels
+namespace HomesForAll.DAL.Models.Landlord
 {
-    public class GetAllPropertiesResponseModel
+    public class RegisterPropertyModel
     {
-        public string Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public int AvailableSpaces { get; set; }
-        public DateTime AddedAt { get; set; }
     }
 }
