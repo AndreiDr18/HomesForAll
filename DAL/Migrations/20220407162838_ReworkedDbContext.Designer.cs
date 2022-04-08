@@ -4,6 +4,7 @@ using HomesForAll.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomesForAll.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220407162838_ReworkedDbContext")]
+    partial class ReworkedDbContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -300,7 +302,7 @@ namespace HomesForAll.DAL.Migrations
                     b.HasOne("HomesForAll.DAL.Entities.User", "LandLord")
                         .WithMany("Properties")
                         .HasForeignKey("LandLordID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("LandLord");
@@ -311,13 +313,13 @@ namespace HomesForAll.DAL.Migrations
                     b.HasOne("HomesForAll.DAL.Entities.Property", "Property")
                         .WithMany("TenantRequests")
                         .HasForeignKey("PropertyID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("HomesForAll.DAL.Entities.User", "Tenant")
                         .WithMany("PropertyRequests")
                         .HasForeignKey("TenantID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("Property");
@@ -330,7 +332,7 @@ namespace HomesForAll.DAL.Migrations
                     b.HasOne("HomesForAll.DAL.Entities.Property", "AcceptedAtProperty")
                         .WithMany("AcceptedTenants")
                         .HasForeignKey("AcceptedAtPropertyID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("AcceptedAtProperty");
                 });

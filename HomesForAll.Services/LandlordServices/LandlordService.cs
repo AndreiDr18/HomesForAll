@@ -6,6 +6,7 @@ using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Utils.ServerResponse.Models.LandlordModels;
 using HomesForAll.Utils.ServerResponse.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomesForAll.Services.LandlordServices
 {
@@ -176,20 +177,28 @@ namespace HomesForAll.Services.LandlordServices
                 };
             }
         }
-        public async Task<ResponseBase<EmptyResponseModel>> AcceptRequest(string requestId)
+        public async Task<ResponseBase<EmptyResponseModel>> AcceptRequest(string requestId, string authToken)
         {
             try
             {
-                var tenantRequest = _dbContext.TenantRequests.FirstOrDefault(tr => tr.Id == Guid.Parse(requestId));
+                var tenantRequest = _dbContext.TenantRequests
+                                               .Include(tr => tr.Property)
+                                               .Include(tr => tr.Property.AcceptedTenants)
+                                               .Include(tr => tr.Tenant)
+                                               .Include(tr => tr.Tenant.PropertyRequests)
+                                               .FirstOrDefault(tr => tr.Id == Guid.Parse(requestId));
+
+                var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
                 if (tenantRequest == null)
                     throw new Exception("The request id is invalid");
                 if (tenantRequest.Property.AvailableSpaces < tenantRequest.NumberOfPeople)
                     throw new Exception("Not enough available spaces");
+                if (tenantRequest.Property.LandLordID != Guid.Parse(landlordId))
+                    throw new Exception("You can only accept requests made to your properties");
 
                 tenantRequest.Status = Status.Accepted;
 
                 tenantRequest.Tenant.AcceptedAtPropertyID = tenantRequest.PropertyID;
-                tenantRequest.Tenant.AcceptedAtProperty = tenantRequest.Property;
                 
                 foreach(var propertyRequest in tenantRequest.Tenant.PropertyRequests)
                 {
@@ -225,7 +234,78 @@ namespace HomesForAll.Services.LandlordServices
                 };
             }
         }
+        public async Task<ResponseBase<EmptyResponseModel>> RevokeRequest(string requestId, string authToken)
+        {
+            try
+            {
+                var tenantRequest = _dbContext.TenantRequests
+                                              .Include(tr => tr.Property)
+                                              .Include(tr => tr.Tenant)
+                                              .FirstOrDefault(tr => tr.Id == Guid.Parse(requestId));
 
+                var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
+                if (tenantRequest == null)
+                    throw new Exception("Invalid request");
 
+                if(tenantRequest.Property.LandLordID != Guid.Parse(landlordId))
+                    throw new Exception("The request has not been made to one of your properties");
+
+                if(tenantRequest.Tenant.AcceptedAtPropertyID == tenantRequest.PropertyID)
+                    throw new Exception("Tenant has already been accepted, you must evict him instead.");
+
+                _dbContext.TenantRequests.Remove(tenantRequest);
+
+                var changes = await _dbContext.SaveChangesAsync();
+                if (changes == 0)
+                    throw new Exception("Couldn't revoke the request");
+
+                return new ResponseBase<EmptyResponseModel>
+                {
+                    Success = true,
+                    Message= "Succesfully revoked the request"
+                };
+
+            }catch (Exception ex)
+            {
+                return new ResponseBase<EmptyResponseModel>
+                {
+                    Success = false,
+                    Message=ex.Message
+                };
+            }
+        }
+        public async Task<ResponseBase<EmptyResponseModel>> DeleteProperty(string propertyId, string authToken)
+        {
+            try
+            {
+                var propertyToDelete = _dbContext.Properties.FirstOrDefault(p => p.Id == Guid.Parse(propertyId));
+
+                if (propertyToDelete == null)
+                    throw new Exception("Invalid property ID");
+
+                var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
+                var acceptedTenants = _dbContext.Users.Where(u => u.AcceptedAtPropertyID == propertyToDelete.Id).ToList();
+
+                if (propertyToDelete.LandLordID != Guid.Parse(landlordId))
+                    throw new Exception("You can only delete your own properties");
+
+                _dbContext.Properties.Remove(propertyToDelete);
+                await _dbContext.SaveChangesAsync();
+
+                return new ResponseBase<EmptyResponseModel>
+                {
+                    Success=true,
+                    Message = "Succesfully deleted the property"
+                };
+            }catch(Exception ex)
+            {
+                return new ResponseBase<EmptyResponseModel>
+                {
+                    Success= false,
+                    Message = ex.Message
+                };
+            }
+        }
+        //Evict tenant
     }
 }

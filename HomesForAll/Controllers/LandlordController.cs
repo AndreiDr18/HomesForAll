@@ -61,9 +61,27 @@ namespace HomesForAll.Controllers
         }
         [HttpGet("acceptRequest/{requestId}")]
         [Authorize(Roles= Roles.Landlord)]
-        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> AcceptRequest([FromRoute] string requestId)
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> AcceptRequest([FromRoute] string requestId, [FromHeader] string authorization)
         {
-            var result = await _landlordService.AcceptRequest(requestId);
+            var result = await _landlordService.AcceptRequest(requestId, authorization);
+
+            if(result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+        [HttpDelete("revokeRequest/{requestId}")]
+        [Authorize(Roles = Roles.Landlord)]
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> RevokeRequest([FromRoute] string requestId, [FromHeader] string authorization)
+        {
+            var result = await _landlordService.RevokeRequest(requestId, authorization);
+
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+        [HttpDelete("deleteProperty/{propertyId}")]
+        [Authorize(Roles = Roles.Landlord)]
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> DeleteProperty([FromRoute] string propertyId, [FromHeader] string authorization)
+        {
+            var result = await _landlordService.DeleteProperty(propertyId, authorization);
 
             if(result.Success) return Ok(result);
             return BadRequest(result);

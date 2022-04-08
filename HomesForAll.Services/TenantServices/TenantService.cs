@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomesForAll.Services.TenantServices
 {
@@ -27,31 +28,59 @@ namespace HomesForAll.Services.TenantServices
             _userManager = userManager;
             _dbContext = dbContext;
         }
-        public async Task<ResponseBase<GetCurrentResponseModel>> GetTenantInfo(string authToken)
+        public async Task<ResponseBase<GetTenantResponseModel>> GetTenantInfo(string authToken)
         {
             try
             {
                 var id = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
 
-                var user = await _userManager.FindByIdAsync(id);
+                var user = _dbContext.Users
+                                     .Include(u => u.PropertyRequests)
+                                     .ThenInclude(pr => pr.Property)
+                                     .FirstOrDefault(u => u.Id == Guid.Parse(id));
+                if (user == null)
+                    throw new Exception("Couldn't fetch tenant info");
 
-                return new ResponseBase<GetCurrentResponseModel>
+                List<TenantRequestResponseModel> PropertyRequests = new();
+
+                if (user.PropertyRequests.Count != 0)
+                    foreach (var propertyRequest in user.PropertyRequests)
+                    {
+
+                        PropertyRequests.Add(new TenantRequestResponseModel
+                        {
+                            RequestID = propertyRequest.Id,
+                            NumberOfPeople = propertyRequest.NumberOfPeople,
+                            Message = propertyRequest.Message,
+                            Status = propertyRequest.Status.ToString(),
+                            Property = new PropertyResponseModel
+                            {
+                                Name = propertyRequest.Property.Name,
+                                AvailableSpaces = propertyRequest.Property.AvailableSpaces,
+                                AddedAt = propertyRequest.Property.AddedAt,
+                                Address = propertyRequest.Property.Address
+                            }
+                        });
+                    }
+
+                return new ResponseBase<GetTenantResponseModel>
                 {
                     Success = true,
                     Message = "User information succesfully retrieved",
-                    Body = new GetCurrentResponseModel
+                    Body = new GetTenantResponseModel
                     {
                         Name = user.Name,
                         PhoneNumber = user.PhoneNumber,
                         DateOfBirth = user.BirthDate,
-                        Username = user.UserName
+                        Username = user.UserName,
+                        PropertyRequests = PropertyRequests
                     }
                 };
 
             }
             catch (Exception ex)
             {
-                return new ResponseBase<GetCurrentResponseModel>
+                return new ResponseBase<GetTenantResponseModel>
                 {
                     Success = false,
                     Message = ex.Message
@@ -146,37 +175,45 @@ namespace HomesForAll.Services.TenantServices
                 };
             }
         }
-        public async Task<ResponseBase<List<GetPropertyRequestResponseModel>>> GetTenantRequests(string authToken)
+        public async Task<ResponseBase<List<GetTenantRequestResponseModel>>> GetTenantRequests(string authToken)
         {
             try
             {
                 var tenantId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
-                List<TenantRequest> tenantRequests = _dbContext.TenantRequests.Where(tr => tr.TenantID == Guid.Parse(tenantId)).ToList();
+                List<TenantRequest> tenantRequests = _dbContext.TenantRequests
+                                                               .Include(x => x.Property)
+                                                               .Where(tr => tr.TenantID == Guid.Parse(tenantId))
+                                                               .ToList();
 
                 if (tenantRequests.Count == 0)
-                    return new ResponseBase<List<GetPropertyRequestResponseModel>>
+                    return new ResponseBase<List<GetTenantRequestResponseModel>>
                     {
                         Success = true,
                         Message = "Tenant has no registered requests"
                     };
 
-                List<GetPropertyRequestResponseModel> tenantRequestsResponse = new List<GetPropertyRequestResponseModel>();
+                List<GetTenantRequestResponseModel> tenantRequestsResponse = new List<GetTenantRequestResponseModel>();
 
                 foreach (var tenantRequest in tenantRequests)
                 {
-                    tenantRequestsResponse.Add(new GetPropertyRequestResponseModel
+                    tenantRequestsResponse.Add(new GetTenantRequestResponseModel
                     {
                         RequestID = tenantRequest.Id,
                         NumberOfPeople = tenantRequest.NumberOfPeople,
                         Message = tenantRequest.Message,
                         Status = tenantRequest.Status.ToString(),
-                        TenantID = tenantRequest.TenantID,
-                        PropertyID = tenantRequest.PropertyID
+                        Property = new PropertyResponseModel
+                        {
+                            Name = tenantRequest.Property.Name,
+                            AvailableSpaces = tenantRequest.Property.AvailableSpaces,
+                            AddedAt = tenantRequest.Property.AddedAt,
+                            Address = tenantRequest.Property.Address
+                        }
 
                     });
                 }
 
-                return new ResponseBase<List<GetPropertyRequestResponseModel>>
+                return new ResponseBase<List<GetTenantRequestResponseModel>>
                 {
                     Success = true,
                     Message = "Succesfully retrieved tenant requests",
@@ -186,7 +223,7 @@ namespace HomesForAll.Services.TenantServices
             }
             catch (Exception ex)
             {
-                return new ResponseBase<List<GetPropertyRequestResponseModel>>
+                return new ResponseBase<List<GetTenantRequestResponseModel>>
                 {
                     Success=false,
                     Message=ex.Message
@@ -198,8 +235,14 @@ namespace HomesForAll.Services.TenantServices
             try
             {
                 var tenantRequest = _dbContext.TenantRequests.Where(tr => tr.Id == Guid.Parse(reqId)).FirstOrDefault();
+                var tenantId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
+
                 if (tenantRequest == null)
                     throw new Exception("There is no request matching the given id");
+                if (tenantRequest.Status == Status.Accepted)
+                    throw new Exception("The request has already been accepted");
+                if (tenantRequest.TenantID != Guid.Parse(tenantId))
+                    throw new Exception("You can only delete requests that are your own");
 
                 _dbContext.TenantRequests.Remove(tenantRequest);
                 var changes = await _dbContext.SaveChangesAsync();

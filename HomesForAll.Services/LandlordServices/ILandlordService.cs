@@ -16,6 +16,8 @@ namespace HomesForAll.Services.LandlordServices
         public Task<ResponseBase<List<GetRequestResponseModel>>> GetRequests(string authToken);
         public Task<ResponseBase<GetLandlordResponseModel>> GetLandlord(string authToken);
         public Task<ResponseBase<EmptyResponseModel>> UpdateLandlord(UpdateLandlordModel model, string authToken);
-        public Task<ResponseBase<EmptyResponseModel>> AcceptRequest(string requestId);
+        public Task<ResponseBase<EmptyResponseModel>> AcceptRequest(string requestId, string authToken);
+        public Task<ResponseBase<EmptyResponseModel>> RevokeRequest(string requestId, string authToken);
+        public Task<ResponseBase<EmptyResponseModel>> DeleteProperty(string propertyId, string authToken);
     }
 }

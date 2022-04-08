@@ -15,34 +15,23 @@ namespace HomesForAll.DAL
         {
             builder.Entity<User>()
                 .HasMany(j => j.Properties)
-                .WithOne(j => j.LandLord);
+                .WithOne(j => j.LandLord)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<User>()
+                .HasMany(u => u.PropertyRequests)
+                .WithOne(tr => tr.Tenant)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Property>()
                .HasMany(p => p.AcceptedTenants)
                .WithOne(t => t.AcceptedAtProperty)
-               .HasPrincipalKey(t => t.Id)
-               .HasForeignKey(t => t.AcceptedAtPropertyID)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.SetNull);
 
-            builder.Entity<Property>()
-                .HasOne(p => p.LandLord)
-                .WithMany(p => p.Properties)
-                .HasPrincipalKey(t=> t.Id)
-                .OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Property>()
                 .HasMany(p => p.TenantRequests)
                 .WithOne(u => u.Property)
-                .HasForeignKey(tr => tr.Id);
-            builder.Entity<TenantRequest>()
-                .HasOne(tr => tr.Tenant)
-                .WithMany(u => u.PropertyRequests)
-                .HasForeignKey(tr => tr.TenantID);
-            builder.Entity<TenantRequest>()
-                .HasOne(tr => tr.Property)
-                .WithMany(p => p.TenantRequests)
-                .HasForeignKey(tr => tr.PropertyID);
-
-            
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);
 

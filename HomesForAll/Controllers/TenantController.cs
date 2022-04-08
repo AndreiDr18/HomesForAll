@@ -24,7 +24,7 @@ namespace HomesForAll.Controllers
         
         [HttpGet("getCurrent")]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<GetCurrentResponseModel>>> Get([FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<GetTenantResponseModel>>> Get([FromHeader] string authorization)
         {
             
             var result = await _tenantService.GetTenantInfo(authorization);
@@ -54,7 +54,7 @@ namespace HomesForAll.Controllers
 
         [HttpGet("getCurrentRequests")]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<List<GetPropertyRequestResponseModel>>>> GetTenantRequests([FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<List<GetTenantRequestResponseModel>>>> GetTenantRequests([FromHeader] string authorization)
         {
             var result = await _tenantService.GetTenantRequests(authorization);
             if (result.Success) return Ok(result);

@@ -6,14 +6,7 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.Utils.ServerResponse.Models.TenantModels
 {
-    public class GetPropertyRequestResponseModel
+    public class GetTenantRequestResponseModel : TenantRequestResponseModel
     {
-        public Guid RequestID { get; set; }
-        public int NumberOfPeople { get; set; }
-        public string Message { get; set; }
-        public string Status { get; set; }
-        public Guid PropertyID { get; set; }
-        public Guid TenantID { get; set; }
-
     }
 }
