@@ -121,7 +121,7 @@ namespace HomesForAll.Services.TenantServices
             }
             
         }
-        public async Task<ResponseBase<EmptyResponseModel>> RequestProperty(RequestPropertyModel model, string authToken)
+        public async Task<ResponseBase<EmptyResponseModel>> SendTenantRequest(TenantRequestModel model, string authToken)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace HomesForAll.Services.TenantServices
                 };
             }
         }
-        public async Task<ResponseBase<List<GetTenantRequestResponseModel>>> GetTenantRequests(string authToken)
+        public async Task<ResponseBase<List<GetRequestResponseModel>>> GetTenantRequests(string authToken)
         {
             try
             {
@@ -186,17 +186,17 @@ namespace HomesForAll.Services.TenantServices
                                                                .ToList();
 
                 if (tenantRequests.Count == 0)
-                    return new ResponseBase<List<GetTenantRequestResponseModel>>
+                    return new ResponseBase<List<GetRequestResponseModel>>
                     {
                         Success = true,
                         Message = "Tenant has no registered requests"
                     };
 
-                List<GetTenantRequestResponseModel> tenantRequestsResponse = new List<GetTenantRequestResponseModel>();
+                List<GetRequestResponseModel> tenantRequestsResponse = new List<GetRequestResponseModel>();
 
                 foreach (var tenantRequest in tenantRequests)
                 {
-                    tenantRequestsResponse.Add(new GetTenantRequestResponseModel
+                    tenantRequestsResponse.Add(new GetRequestResponseModel
                     {
                         RequestID = tenantRequest.Id,
                         NumberOfPeople = tenantRequest.NumberOfPeople,
@@ -213,7 +213,7 @@ namespace HomesForAll.Services.TenantServices
                     });
                 }
 
-                return new ResponseBase<List<GetTenantRequestResponseModel>>
+                return new ResponseBase<List<GetRequestResponseModel>>
                 {
                     Success = true,
                     Message = "Succesfully retrieved tenant requests",
@@ -223,7 +223,7 @@ namespace HomesForAll.Services.TenantServices
             }
             catch (Exception ex)
             {
-                return new ResponseBase<List<GetTenantRequestResponseModel>>
+                return new ResponseBase<List<GetRequestResponseModel>>
                 {
                     Success=false,
                     Message=ex.Message

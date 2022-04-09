@@ -20,10 +20,10 @@ namespace HomesForAll.Controllers
         }
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseBase<AuthenticationResponseModel>>> Register([FromBody]RegistrationModel model)
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> Register([FromBody]RegistrationModel model)
         {
             var result = await _authenticationService.Register(model);
-
+            
             if(result.Success) return Ok(result);
             return BadRequest(result);
 
@@ -38,6 +38,15 @@ namespace HomesForAll.Controllers
             if (result.Success) return Ok(result);
             return BadRequest(result);
 
+        }
+        [HttpGet("refreshToken")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ResponseBase<AuthenticationResponseModel>>> RefreshToken([FromHeader] string authorization, [FromHeader] string refreshToken)
+        {
+            var result = await _authenticationService.RefreshToken(authorization, refreshToken);
+
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
         }
     }
 }

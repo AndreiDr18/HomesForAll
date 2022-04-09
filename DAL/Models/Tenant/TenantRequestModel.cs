@@ -7,7 +7,7 @@ using HomesForAll.DAL.Entities;
 
 namespace HomesForAll.DAL.Models.Tenant
 {
-    public class RequestPropertyModel
+    public class TenantRequestModel
     {
         public Guid PropertyId { get; set; }
         public int NumberOfPeople { get; set; }

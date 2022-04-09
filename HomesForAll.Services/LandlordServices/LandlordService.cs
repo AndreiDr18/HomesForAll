@@ -63,7 +63,7 @@ namespace HomesForAll.Services.LandlordServices
             }
 
         }
-        public async Task<ResponseBase<List<GetRequestResponseModel>>> GetRequests(string authToken)
+        public async Task<ResponseBase<List<GetTenantRequestResponseModel>>> GetRequests(string authToken)
         {
             try
             {
@@ -77,13 +77,13 @@ namespace HomesForAll.Services.LandlordServices
                 if (allRequests.Count == 0)
                     throw new Exception("There are no registered requests");
 
-                List<GetRequestResponseModel> matchedRequests = new List<GetRequestResponseModel>();
+                List<GetTenantRequestResponseModel> matchedRequests = new List<GetTenantRequestResponseModel>();
                 foreach(var property in landlordProperties)
                 {
                     foreach(var request in allRequests)
                     {
                         if (request.PropertyID == property.Id)
-                            matchedRequests.Add(new GetRequestResponseModel
+                            matchedRequests.Add(new GetTenantRequestResponseModel
                             {
                                 RequestID = request.Id,
                                 NumberOfPeople = request.NumberOfPeople,
@@ -94,7 +94,7 @@ namespace HomesForAll.Services.LandlordServices
                             });
                     }
                 }
-                return new ResponseBase<List<GetRequestResponseModel>>
+                return new ResponseBase<List<GetTenantRequestResponseModel>>
                 {
                     Success = true,
                     Message = "Sucesfully retrieved requests",
@@ -103,7 +103,7 @@ namespace HomesForAll.Services.LandlordServices
             }
             catch (Exception ex)
             {
-                return new ResponseBase<List<GetRequestResponseModel>>
+                return new ResponseBase<List<GetTenantRequestResponseModel>>
                 {
                     Success = false,
                     Message = ex.Message

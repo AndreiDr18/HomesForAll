@@ -25,7 +25,7 @@ namespace HomesForAll.Controllers
 
         [HttpGet("getPropertyRequests")]
         [Authorize(Roles = Roles.Landlord)]
-        public async Task<ActionResult<ResponseBase<List<GetRequestResponseModel>>>> GetRequests([FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<List<GetTenantRequestResponseModel>>>> GetRequests([FromHeader] string authorization)
         {
             var result = await _landlordService.GetRequests(authorization);
             if (result.Success) return Ok(result);

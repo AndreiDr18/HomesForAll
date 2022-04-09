@@ -45,16 +45,16 @@ namespace HomesForAll.Controllers
         }
         [HttpPost("requestProperty")]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> RequestProperty([FromBody] RequestPropertyModel model, [FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> SendTenantRequest([FromBody] TenantRequestModel model, [FromHeader] string authorization)
         {
-            var result = await _tenantService.RequestProperty(model, authorization);
+            var result = await _tenantService.SendTenantRequest(model, authorization);
             if (result.Success) return Ok(result);
             return BadRequest(result);
         }
 
         [HttpGet("getCurrentRequests")]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<List<GetTenantRequestResponseModel>>>> GetTenantRequests([FromHeader] string authorization)
+        public async Task<ActionResult<ResponseBase<List<GetRequestResponseModel>>>> GetTenantRequests([FromHeader] string authorization)
         {
             var result = await _tenantService.GetTenantRequests(authorization);
             if (result.Success) return Ok(result);

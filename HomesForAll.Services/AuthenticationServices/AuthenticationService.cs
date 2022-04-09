@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using HomesForAll.Utils.JWT;
 using HomesForAll.DAL.Models.Authentication;
+using HomesForAll.DAL;
 
 namespace HomesForAll.Services.AuthenticationServices
 {
@@ -15,6 +16,7 @@ namespace HomesForAll.Services.AuthenticationServices
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly AppDbContext _dbContext;
 
         public AuthenticationService(
             UserManager<User> userManager,
@@ -26,7 +28,7 @@ namespace HomesForAll.Services.AuthenticationServices
             this._configuration = configuration;
         }
         
-        public async Task<ResponseBase<AuthenticationResponseModel>> Register(RegistrationModel model)
+        public async Task<ResponseBase<EmptyResponseModel>> Register(RegistrationModel model)
         {
             try
             {
@@ -64,30 +66,15 @@ namespace HomesForAll.Services.AuthenticationServices
 
                 await _userManager.AddToRoleAsync(user, model.Role);
 
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(ClaimTypes.Role, model.Role),
-                    new Claim("UserId", user.Id.ToString())
-                };
-                
-                var token = TokenManager.CreateToken(authClaims, _configuration);
-
-                return new ResponseBase<AuthenticationResponseModel>()
+                return new ResponseBase<EmptyResponseModel>()
                 {
                     Success = true,
-                    Message = "User created succesfully",
-                    Body = new AuthenticationResponseModel
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(token)
-                        
-                    }
+                    Message = "User created succesfully, waiting for email confirmation"
                 };
             }
             catch (Exception ex)
             {
-                return new ResponseBase<AuthenticationResponseModel>()
+                return new ResponseBase<EmptyResponseModel>()
                 {
                     Success = false,
                     Message = ex.Message
@@ -119,7 +106,16 @@ namespace HomesForAll.Services.AuthenticationServices
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
+                var refreshToken = TokenManager.GenerateRefreshToken();
+
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenExpiryDate = DateTime.Now.AddDays(7);
+
+                await _userManager.UpdateAsync(user);
+
                 var token = TokenManager.CreateToken(authClaims, _configuration);
+
+                
 
                 return new ResponseBase<AuthenticationResponseModel>
                 {
@@ -127,7 +123,8 @@ namespace HomesForAll.Services.AuthenticationServices
                     Message = "Logged in succesfully",
                     Body = new AuthenticationResponseModel
                     {
-                        token = new JwtSecurityTokenHandler().WriteToken(token)
+                        Token = new JwtSecurityTokenHandler().WriteToken(token),
+                        RefreshToken = refreshToken
                     }
                 };
                 
@@ -139,6 +136,51 @@ namespace HomesForAll.Services.AuthenticationServices
                 {
                     Success= false,
                     Message= ex.Message
+                };
+            }
+        }
+        public async Task<ResponseBase<AuthenticationResponseModel>> RefreshToken(string authToken, string refreshToken)
+        {
+            try
+            {
+                if (authToken == null || refreshToken == null)
+                    throw new Exception("Invalid authorization or refresh token");
+
+                var principal = TokenManager.GetPrincipalFromExpiredToken(authToken, _configuration);
+                if (principal == null)
+                    throw new Exception("Invalid token");
+
+                var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+                if (user == null)
+                    throw new Exception("User doesn't exist");
+
+                if (user.RefreshToken != refreshToken || user.RefreshTokenExpiryDate < DateTime.Now)
+                    throw new Exception("Invalid refresh token");
+
+                var newRefreshToken = TokenManager.GenerateRefreshToken();
+                var newAuthToken = TokenManager.CreateToken(principal.Claims.ToList(), _configuration);
+
+                user.RefreshToken = newRefreshToken;
+                _userManager.UpdateAsync(user);
+
+                return new ResponseBase<AuthenticationResponseModel>
+                {
+                    Success = true,
+                    Message="Succesfully refreshed token",
+                    Body = new AuthenticationResponseModel
+                    {
+                        Token = new JwtSecurityTokenHandler().WriteToken(newAuthToken),
+                        RefreshToken = newRefreshToken
+                    }
+                };
+
+
+            }catch(Exception ex)
+            {
+                return new ResponseBase<AuthenticationResponseModel>
+                {
+                    Success= false,
+                    Message = ex.Message
                 };
             }
         }

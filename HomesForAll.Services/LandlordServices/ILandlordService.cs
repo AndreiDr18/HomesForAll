@@ -13,7 +13,7 @@ namespace HomesForAll.Services.LandlordServices
     public interface ILandlordService
     {
         public Task<ResponseBase<RegisterPropertyResponseModel>> RegisterProperty(RegisterPropertyModel model, string authToken);
-        public Task<ResponseBase<List<GetRequestResponseModel>>> GetRequests(string authToken);
+        public Task<ResponseBase<List<GetTenantRequestResponseModel>>> GetRequests(string authToken);
         public Task<ResponseBase<GetLandlordResponseModel>> GetLandlord(string authToken);
         public Task<ResponseBase<EmptyResponseModel>> UpdateLandlord(UpdateLandlordModel model, string authToken);
         public Task<ResponseBase<EmptyResponseModel>> AcceptRequest(string requestId, string authToken);

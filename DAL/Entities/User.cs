@@ -20,5 +20,9 @@ namespace HomesForAll.DAL.Entities
         public Property? AcceptedAtProperty { get; set; }
         public Guid? AcceptedAtPropertyID { get; set; }
         public ICollection<TenantRequest>? PropertyRequests { get; set; }
+
+        //Auth
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryDate { get; set; }
     }
 }

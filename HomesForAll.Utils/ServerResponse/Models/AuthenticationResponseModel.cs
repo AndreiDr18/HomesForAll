@@ -8,6 +8,7 @@ namespace HomesForAll.Utils.ServerResponse.Models
 {
     public class AuthenticationResponseModel
     {
-        public string token { get; set; }
+        public string Token { get; set; }
+        public string RefreshToken { get; set; }
     }
 }
