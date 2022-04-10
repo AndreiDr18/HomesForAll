@@ -8,6 +8,7 @@ using System.Security.Claims;
 using HomesForAll.Utils.JWT;
 using HomesForAll.DAL.Models.Authentication;
 using HomesForAll.DAL;
+using HomesForAll.Utils.Mail;
 
 namespace HomesForAll.Services.AuthenticationServices
 {
@@ -16,7 +17,6 @@ namespace HomesForAll.Services.AuthenticationServices
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
-        private readonly AppDbContext _dbContext;
 
         public AuthenticationService(
             UserManager<User> userManager,
@@ -66,6 +66,8 @@ namespace HomesForAll.Services.AuthenticationServices
 
                 await _userManager.AddToRoleAsync(user, model.Role);
 
+                MailManager.SendRegistrationMail(user.Id, user.Email, user.Name);
+
                 return new ResponseBase<EmptyResponseModel>()
                 {
                     Success = true,
@@ -86,10 +88,13 @@ namespace HomesForAll.Services.AuthenticationServices
             
             try
             {
-                var user = await _userManager.FindByNameAsync(model.Username);
+                var user = await _userManager.FindByNameAsync(model.Username);  
 
                 if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
                     throw new Exception("Invalid login");
+
+                if (!user.EmailConfirmed)
+                    throw new Exception("Email is not confirmed");
 
                 var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -113,7 +118,7 @@ namespace HomesForAll.Services.AuthenticationServices
 
                 await _userManager.UpdateAsync(user);
 
-                var token = TokenManager.CreateToken(authClaims, _configuration);
+                var token = TokenManager.CreateToken(authClaims);
 
                 
 
@@ -146,8 +151,8 @@ namespace HomesForAll.Services.AuthenticationServices
                 if (authToken == null || refreshToken == null)
                     throw new Exception("Invalid authorization or refresh token");
 
-                var principal = TokenManager.GetPrincipalFromExpiredToken(authToken, _configuration);
-                if (principal == null)
+                var principal = TokenManager.GetPrincipalFromExpiredToken(authToken);
+                if (principal == null || principal.Identity == null)
                     throw new Exception("Invalid token");
 
                 var user = await _userManager.FindByNameAsync(principal.Identity.Name);
@@ -158,10 +163,10 @@ namespace HomesForAll.Services.AuthenticationServices
                     throw new Exception("Invalid refresh token");
 
                 var newRefreshToken = TokenManager.GenerateRefreshToken();
-                var newAuthToken = TokenManager.CreateToken(principal.Claims.ToList(), _configuration);
+                var newAuthToken = TokenManager.CreateToken(principal.Claims.ToList());
 
                 user.RefreshToken = newRefreshToken;
-                _userManager.UpdateAsync(user);
+                await _userManager.UpdateAsync(user);
 
                 return new ResponseBase<AuthenticationResponseModel>
                 {
@@ -181,6 +186,35 @@ namespace HomesForAll.Services.AuthenticationServices
                 {
                     Success= false,
                     Message = ex.Message
+                };
+            }
+        }
+        public async Task<ResponseBase<EmptyResponseModel>> VerifyEmail(string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                    throw new Exception("Invalid user id");
+
+                if (user.EmailConfirmed)
+                    throw new Exception("Email has already been confirmed");
+
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+
+                return new ResponseBase<EmptyResponseModel>
+                {
+                    Success = true,
+                    Message = "Email succesfully confirmed"
+                };
+
+            }catch(Exception ex)
+            {
+                return new ResponseBase<EmptyResponseModel>
+                {
+                    Success=false,
+                    Message=ex.Message
                 };
             }
         }

@@ -4,13 +4,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using HomesForAll.Services;
 using HomesForAll.DAL.UserRoles;
 using System.Text;
+using Serilog;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, lc) => lc
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:7165"));
+
 ConfigurationManager configuration = builder.Configuration;
 
 // Add services to the container.
@@ -19,14 +24,29 @@ builder.Services.AddControllers();
 builder.Services.AddServices();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.EnableAnnotations();
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Homes For All",
+        Description = "An API used for housing centralisation and tenancy pairing for refugees and people in need of accomodations due to lack of financial status.",
+    });
+    var filePath = Path.Combine(System.AppContext.BaseDirectory, "HomesForAllDocumentation.xml");
+    c.IncludeXmlComments(filePath);
+});
 
 //Making the database connection + adding a DBContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b=> b.MigrationsAssembly("HomesForAll.DAL"))
 );
 
-builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+    opt.SignIn.RequireConfirmedEmail = true;
+})
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -46,15 +66,14 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = false,
         ValidateAudience = false,
-        ValidAudience = configuration["JWT:ValidAudience"],
-        ValidIssuer = configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
+        ValidAudience = Environment.GetEnvironmentVariable("JWT:VALIDAUDIENCE"),
+        ValidIssuer = Environment.GetEnvironmentVariable("JWT:VALIDISSUER"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT:SECRET")))
     };
 });
 
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

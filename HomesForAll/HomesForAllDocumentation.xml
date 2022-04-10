@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HomesForAll</name>
+    </assembly>
+    <members>
+        <member name="M:HomesForAll.Controllers.AuthController.Register(HomesForAll.DAL.Models.Authentication.RegistrationModel)">
+            <summary>
+                 Register a user
+            </summary>
+        </member>
+        <member name="M:HomesForAll.Controllers.AuthController.Login(HomesForAll.DAL.Models.Authentication.LoginModel)">
+            <summary>
+                Exchange username and password for bearer authorization token
+            </summary>
+            <param name="model"></param>
+        </member>
+        <member name="M:HomesForAll.Controllers.AuthController.RefreshToken(System.String,System.String)">
+            <summary>
+                Exchange an expired authorization token alongside its corresponding refresh token for new ones
+            </summary>
+            <param name="authorization"></param>
+            <param name="refreshToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.AuthController.VerifyEmail(System.String)">
+            <summary>
+                Email verification for newly registered users
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.GetRequests(System.String)">
+            <summary>
+                Get all tenancy requests sent to every property owned
+            </summary>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.RegisterProperty(HomesForAll.DAL.Models.Landlord.RegisterPropertyModel,System.String)">
+            <summary>
+                Register property to be up for tenancy requests
+            </summary>
+            <param name="model"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.GetLandlord(System.String)">
+            <summary>
+                Get user information about current landlord
+            </summary>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.UpdateLandlord(HomesForAll.DAL.Models.Landlord.UpdateLandlordModel,System.String)">
+            <summary>
+                Update user information regarding current landlord
+            </summary>
+            <param name="model"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.AcceptRequest(System.String,System.String)">
+            <summary>
+                Accept tenancy request based on it's corresponding id
+            </summary>
+            <param name="requestId"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.RevokeRequest(System.String,System.String)">
+            <summary>
+                Revoke tenancy request based on its id
+            </summary>
+            <param name="requestId"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.DeleteProperty(System.String,System.String)">
+            <summary>
+                Delete a property
+            </summary>
+            <param name="propertyId"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.PropertyController.GetAllProperties">
+            <summary>
+                Get every property registered
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.PropertyController.GetPropertyById(System.String)">
+            <summary>
+                Get a single property based on its id
+            </summary>
+            <param name="propertyId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.TenantController.GetTenantInfo(System.String)">
+            <summary>
+                Get tenant information
+            </summary>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.TenantController.UpdateTenant(HomesForAll.DAL.Models.Tenant.TenantUpdateModel,System.String)">
+            <summary>
+                Update tenant information
+            </summary>
+            <param name="model"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.TenantController.SendTenantRequest(HomesForAll.DAL.Models.Tenant.TenantRequestModel,System.String)">
+            <summary>
+                Send a tenancy request
+            </summary>
+            <param name="model"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.TenantController.GetTenantRequests(System.String)">
+            <summary>
+                Get tenancy requests sent from a single tenant
+            </summary>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.TenantController.DeleteRequest(System.String,System.String)">
+            <summary>
+                Delete tenancy request
+            </summary>
+            <param name="authorization"></param>
+            <param name="reqId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.TenantController.GetLandlordContactDetails(System.String)">
+            <summary>
+                Get Landlord information from the property to which tenant's been accepted
+            </summary>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -12,13 +12,13 @@ namespace HomesForAll.Utils.JWT
     {
         
 
-        static public JwtSecurityToken CreateToken(in List<Claim> authClaims,in IConfiguration _configuration)
+        static public JwtSecurityToken CreateToken(in List<Claim> authClaims)
         {
-            var signKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var signKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT:SECRET")));
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
+                issuer: Environment.GetEnvironmentVariable("JWT:VALIDISSUER"),
+                audience: Environment.GetEnvironmentVariable("JWT:VALIDAUDIENCE"),
                 expires: DateTime.Now.AddMinutes(10),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(signKey, SecurityAlgorithms.HmacSha256)
@@ -47,7 +47,7 @@ namespace HomesForAll.Utils.JWT
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-        public static ClaimsPrincipal? GetPrincipalFromExpiredToken(string? authToken, IConfiguration _configuration)
+        public static ClaimsPrincipal? GetPrincipalFromExpiredToken(string? authToken)
         {
             string jwt;
             var tokenValidationParameters = new TokenValidationParameters
@@ -55,7 +55,7 @@ namespace HomesForAll.Utils.JWT
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT:SECRET"))),
                 ValidateLifetime = false
             };
 

@@ -61,6 +61,7 @@ namespace HomesForAll.Services.PropertyServices
             try
             {
                 var properties = _dbContext.Properties.ToList();
+
                 if (properties.Count == 0)
                     throw new Exception("There are no registered properties");
 

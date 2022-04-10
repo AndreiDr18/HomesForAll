@@ -34,12 +34,20 @@ namespace HomesForAll.Services.TenantServices
             {
                 var id = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
 
+                #pragma warning disable
                 var user = _dbContext.Users
                                      .Include(u => u.PropertyRequests)
                                      .ThenInclude(pr => pr.Property)
                                      .FirstOrDefault(u => u.Id == Guid.Parse(id));
+                #pragma warning restore
                 if (user == null)
                     throw new Exception("Couldn't fetch tenant info");
+                if (user.PropertyRequests == null)
+                    return new ResponseBase<GetTenantResponseModel>
+                    {
+                        Success = false,
+                        Message = "No request has been registered"
+                    };
 
                 List<TenantRequestResponseModel> PropertyRequests = new();
 
@@ -55,6 +63,7 @@ namespace HomesForAll.Services.TenantServices
                             Status = propertyRequest.Status.ToString(),
                             Property = new PropertyResponseModel
                             {
+                                Id = propertyRequest.PropertyID,
                                 Name = propertyRequest.Property.Name,
                                 AvailableSpaces = propertyRequest.Property.AvailableSpaces,
                                 AddedAt = propertyRequest.Property.AddedAt,
@@ -125,12 +134,13 @@ namespace HomesForAll.Services.TenantServices
         {
             try
             {
+                #pragma warning disable
                 var tenantId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
                 var tenant = await _userManager.FindByIdAsync(tenantId);
                 var property = _dbContext.Properties.FirstOrDefault(p => p.Id == model.PropertyId);
 
                 var requestExists = _dbContext.TenantRequests.Where(tr => tr.TenantID == Guid.Parse(tenantId) && tr.PropertyID == property.Id).Any();
-
+                #pragma warning restore
                 if (tenantId == null || tenant == null || property == null)
                     throw new Exception("Tenant or property couldn't be fetched");
 
@@ -204,6 +214,7 @@ namespace HomesForAll.Services.TenantServices
                         Status = tenantRequest.Status.ToString(),
                         Property = new PropertyResponseModel
                         {
+                            Id = tenantRequest.Id,
                             Name = tenantRequest.Property.Name,
                             AvailableSpaces = tenantRequest.Property.AvailableSpaces,
                             AddedAt = tenantRequest.Property.AddedAt,
@@ -268,6 +279,42 @@ namespace HomesForAll.Services.TenantServices
             }
 
         }
-        //Get Accepted Property Details
+        public async Task<ResponseBase<GetAcceptedAtLandlordInfo>> GetLandlordInfo(string authToken)
+        {
+            try
+            {
+                var userId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
+                var user = _dbContext.Users
+                                     .Include(u => u.AcceptedAtProperty)
+                                     .ThenInclude(aap => aap.LandLord)
+                                     .FirstOrDefault(u => u.Id == Guid.Parse(userId));
+                if (user == null)
+                    throw new Exception("No user matching given authorization token");
+                if (user.AcceptedAtProperty == null)
+                    throw new Exception("User has not been accepted to any property yet");
+
+                return new ResponseBase<GetAcceptedAtLandlordInfo>
+                {
+                    Success = true,
+                    Message = "Succesfully retrieved landlord info",
+                    Body = new GetAcceptedAtLandlordInfo
+                    {
+                        Name = user.AcceptedAtProperty.LandLord.Name,
+                        PhoneNumber = user.AcceptedAtProperty.LandLord.PhoneNumber,
+                        JoinedAtDate = user.AcceptedAtProperty.LandLord.JoinedAtDate,
+                        BirthDate = user.AcceptedAtProperty.LandLord.BirthDate
+                    }
+                };
+
+
+            }catch (Exception ex)
+            {
+                return new ResponseBase<GetAcceptedAtLandlordInfo>
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
     }
 }

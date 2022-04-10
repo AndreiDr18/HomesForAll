@@ -22,8 +22,14 @@ namespace HomesForAll.Controllers
             _propertyService = propertyService;
         }
 
+        /// <summary>
+        ///     Get every property registered
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("getAll")]
         [Authorize(Roles = $"{Roles.Tenant},{Roles.Landlord}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseBase<EmptyResponseModel>), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ResponseBase<List<Property>>>> GetAllProperties()
         {
             var result = await _propertyService.GetAllProperties();
@@ -32,6 +38,11 @@ namespace HomesForAll.Controllers
             return BadRequest(result);
         }
 
+        /// <summary>
+        ///     Get a single property based on its id
+        /// </summary>
+        /// <param name="propertyId"></param>
+        /// <returns></returns>
         [HttpGet("getById/{propertyId}")]
         [Authorize(Roles = Roles.Tenant)]
         public async Task<ActionResult<ResponseBase<List<Property>>>> GetPropertyById([FromRoute] string propertyId)

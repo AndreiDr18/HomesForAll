@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.Utils.ServerResponse.Models.TenantModels
 {
-    public struct PropertyResponseModel
+    public class GetAcceptedAtLandlordInfo
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Address { get; set; }
-        public int AvailableSpaces { get; set; }
-        public DateTime AddedAt { get; set; }
+        public DateTime BirthDate { get; set; }
+        public DateTime JoinedAtDate { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }
