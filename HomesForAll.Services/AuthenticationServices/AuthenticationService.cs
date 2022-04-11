@@ -7,8 +7,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using HomesForAll.Utils.JWT;
 using HomesForAll.DAL.Models.Authentication;
-using HomesForAll.DAL;
 using HomesForAll.Utils.Mail;
+using Serilog;
 
 namespace HomesForAll.Services.AuthenticationServices
 {
@@ -16,16 +16,16 @@ namespace HomesForAll.Services.AuthenticationServices
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-        private readonly IConfiguration _configuration;
+        private readonly ILogger _logger;
 
         public AuthenticationService(
             UserManager<User> userManager,
             RoleManager<IdentityRole<Guid>> roleManager,
-            IConfiguration configuration)
+            ILogger logger)
         {
-            this._userManager = userManager;
-            this._roleManager = roleManager;
-            this._configuration = configuration;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _logger = logger;
         }
         
         public async Task<ResponseBase<EmptyResponseModel>> Register(RegistrationModel model)
@@ -91,7 +91,12 @@ namespace HomesForAll.Services.AuthenticationServices
                 var user = await _userManager.FindByNameAsync(model.Username);  
 
                 if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+                {
+                    _logger.Information("Invalid login provided: {FullName}, model : {@Model}", typeof(AuthenticationService).FullName, model);
                     throw new Exception("Invalid login");
+                    
+                }
+                    
 
                 if (!user.EmailConfirmed)
                     throw new Exception("Email is not confirmed");
@@ -193,6 +198,7 @@ namespace HomesForAll.Services.AuthenticationServices
         {
             try
             {
+                
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                     throw new Exception("Invalid user id");

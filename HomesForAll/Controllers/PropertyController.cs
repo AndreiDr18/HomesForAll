@@ -1,5 +1,4 @@
 ﻿using HomesForAll.DAL.Entities;
-//using HomesForAll.DAL.Models.Property;
 using HomesForAll.DAL.UserRoles;
 using HomesForAll.Services.PropertyServices;
 using HomesForAll.Utils.ServerResponse;
@@ -30,7 +29,7 @@ namespace HomesForAll.Controllers
         [Authorize(Roles = $"{Roles.Tenant},{Roles.Landlord}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseBase<EmptyResponseModel>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ResponseBase<List<Property>>>> GetAllProperties()
+        public async Task<ActionResult<ResponseBase<List<GetPropertyResponseModel>>>> GetAllProperties()
         {
             var result = await _propertyService.GetAllProperties();
 
@@ -45,7 +44,7 @@ namespace HomesForAll.Controllers
         /// <returns></returns>
         [HttpGet("getById/{propertyId}")]
         [Authorize(Roles = Roles.Tenant)]
-        public async Task<ActionResult<ResponseBase<List<Property>>>> GetPropertyById([FromRoute] string propertyId)
+        public async Task<ActionResult<ResponseBase<List<GetPropertyResponseModel>>>> GetPropertyById([FromRoute] string propertyId)
         {
             var result = await _propertyService.GetProperty(propertyId);
 

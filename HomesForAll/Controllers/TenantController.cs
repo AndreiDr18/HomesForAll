@@ -27,7 +27,7 @@ namespace HomesForAll.Controllers
         /// </summary>
         /// <param name="authorization"></param>
         /// <returns></returns>
-        [HttpGet("getCurrent")]
+        [HttpGet("getTenant")]
         [Authorize(Roles = Roles.Tenant)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseBase<EmptyResponseModel>), StatusCodes.Status400BadRequest)]
@@ -46,7 +46,7 @@ namespace HomesForAll.Controllers
         /// <param name="model"></param>
         /// <param name="authorization"></param>
         /// <returns></returns>
-        [HttpPut("updateCurrent")]
+        [HttpPut("updateTenant")]
         [Authorize(Roles = Roles.Tenant)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseBase<EmptyResponseModel>), StatusCodes.Status400BadRequest)]

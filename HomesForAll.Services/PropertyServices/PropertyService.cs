@@ -1,6 +1,5 @@
 ﻿using HomesForAll.DAL;
 using HomesForAll.DAL.Entities;
-//using HomesForAll.DAL.Models.Property;
 using HomesForAll.Utils.JWT;
 using HomesForAll.Utils.ServerResponse;
 using HomesForAll.Utils.ServerResponse.Models.PropertyModels;
