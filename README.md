@@ -37,8 +37,9 @@ dotnet build
 
 HomesForAll exposes endpoints from four controllers: AuthController, TenantController, LandlordController and PropertyController
 
-Base reponse is of object type ServerResponse<TBody>:
+Base reponse is of object type
 ```bash
+ServerResponse<TBody>
   {
     Success = bool,
     Message = string,
