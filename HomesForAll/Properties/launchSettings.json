@@ -16,7 +16,7 @@
       "environmentVariables": {
         "JWT:VALIDISSUER": "http:/localhost:7165",
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SENDGRIDAPIKEY": "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",
+        "SENDGRIDAPIKEY": "",
         "JWT:VALIDAUDIENCE": "http:/localhost:7165",
         "JWT:SECRET": "hVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x"
       },
