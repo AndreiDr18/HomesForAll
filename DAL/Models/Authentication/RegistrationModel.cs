@@ -23,5 +23,18 @@ namespace HomesForAll.DAL.Models.Authentication
         public string Role { get; set; }
         [JsonProperty("BirthDate")]
         public DateTime BirthDate { get; set; }
+
+        public bool VerifyIntegrity()
+        {
+            if (Name == "" || Name == null)
+                return false;
+            if (PhoneNumber == "" || PhoneNumber == null)
+                return false;
+            if (Username == "" || Username == null)
+                return false;
+            if (Role == "" || Role == null)
+                return false;
+            return true;
+        }
     }
 }

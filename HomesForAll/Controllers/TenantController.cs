@@ -35,9 +35,8 @@ namespace HomesForAll.Controllers
         {
             
             var result = await _tenantService.GetTenantInfo(authorization);
-            
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -54,8 +53,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _tenantService.UpdateTenant(model, authorization);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result); 
+            return Ok(result);
 
         }
 
@@ -72,8 +70,8 @@ namespace HomesForAll.Controllers
         public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> SendTenantRequest([FromBody] TenantRequestModel model, [FromHeader] string authorization)
         {
             var result = await _tenantService.SendTenantRequest(model, authorization);
-            if (result.Success) return Created("https://localhost:7165",result);
-            return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -86,8 +84,8 @@ namespace HomesForAll.Controllers
         public async Task<ActionResult<ResponseBase<List<GetRequestResponseModel>>>> GetTenantRequests([FromHeader] string authorization)
         {
             var result = await _tenantService.GetTenantRequests(authorization);
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -103,8 +101,8 @@ namespace HomesForAll.Controllers
         public async Task<ActionResult<ResponseBase<EmptyResponseModel>>> DeleteRequest([FromHeader] string authorization, [FromRoute] string reqId)
         {
             var result = await _tenantService.DeleteRequest(authorization, reqId);
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -118,8 +116,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _tenantService.GetLandlordInfo(authorization);
 
-            if(result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
     }
 }

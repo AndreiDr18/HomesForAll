@@ -35,8 +35,7 @@ namespace HomesForAll.Controllers
         public async Task<ActionResult<ResponseBase<List<GetTenantRequestResponseModel>>>> GetRequests([FromHeader] string authorization)
         {
             var result = await _landlordService.GetRequests(authorization);
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -53,8 +52,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _landlordService.RegisterProperty(model, authorization);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -70,8 +68,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _landlordService.GetLandlord(authorization);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -88,8 +85,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _landlordService.UpdateLandlord(model, authorization);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -106,8 +102,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _landlordService.AcceptRequest(requestId, authorization);
 
-            if(result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -124,8 +119,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _landlordService.RevokeRequest(requestId, authorization);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -142,8 +136,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _landlordService.DeleteProperty(propertyId, authorization);
 
-            if(result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
     }

@@ -15,5 +15,16 @@ namespace HomesForAll.DAL.Models.Landlord
         public string Address { get; set; }
         [JsonProperty("AvailableSpaces")]
         public int AvailableSpaces { get; set; }
+
+        public bool VerifyIntegrity()
+        {
+            if (this.Name == "" || this.Name == null)
+                return false;
+            if (this.Address == "" || this.Address == null)
+                return false;
+            if (this.AvailableSpaces <= 0)
+                return false;
+            return true;
+        }
     }
 }

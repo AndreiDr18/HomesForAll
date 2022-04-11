@@ -33,8 +33,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _propertyService.GetAllProperties();
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -48,8 +47,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _propertyService.GetProperty(propertyId);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
     }

@@ -10,59 +10,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HomesForAll.Utils.CustomExceptionUtil;
+using System.Net;
 
 namespace HomesForAll.Services.PropertyServices
 {
     public class PropertyService : IPropertyService
     {
         private readonly AppDbContext _dbContext;
-        private readonly UserManager<User> _userManager;
-        public PropertyService(AppDbContext dbContext, UserManager<User> userManager)
+        public PropertyService(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-            _userManager = userManager;
         }
-        //Tenant Access
+
         public async Task<ResponseBase<GetPropertyResponseModel>> GetProperty(string propertyId)
         {
-            try
+            var property = _dbContext.Properties.FirstOrDefault(p => p.Id == Guid.Parse(propertyId));
+            if (propertyId == null)
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid property id");
+            if (property == null)
+                throw new CustomException(HttpStatusCode.NotFound,"There is no property matching the given property id");
+            return new ResponseBase<GetPropertyResponseModel>
             {
-                var property = _dbContext.Properties.FirstOrDefault(p => p.Id == Guid.Parse(propertyId));
-                if (property == null)
-                    throw new Exception("There is no property matching the given property id");
-                return new ResponseBase<GetPropertyResponseModel>
+                Success = true,
+                Message = "Succesfully retrieved property",
+                Body = new GetPropertyResponseModel
                 {
-                    Success = true,
-                    Message = "Succesfully retrieved property",
-                    Body = new GetPropertyResponseModel
-                    {
-                        Id = property.Id,
-                        Name = property.Name,
-                        Address = property.Address,
-                        AvailableSpaces = property.AvailableSpaces,
-                        AddedAt = property.AddedAt
+                    Id = property.Id,
+                    Name = property.Name,
+                    Address = property.Address,
+                    AvailableSpaces = property.AvailableSpaces,
+                    AddedAt = property.AddedAt
 
-                    }
+                }
 
-                };
-
-            }catch (Exception ex)
-            {
-                return new ResponseBase<GetPropertyResponseModel>
-                {
-                    Success = false,
-
-                };
-            }
+            };
         }
         public async Task<ResponseBase<List<GetPropertyResponseModel>>> GetAllProperties()
         {
-            try
-            {
                 var properties = _dbContext.Properties.ToList();
 
                 if (properties.Count == 0)
-                    throw new Exception("There are no registered properties");
+                    throw new CustomException(HttpStatusCode.OK,"There are no registered properties");
 
                 List<GetPropertyResponseModel> Body = new List<GetPropertyResponseModel>();
 
@@ -83,17 +72,6 @@ namespace HomesForAll.Services.PropertyServices
                     Message = "Succesfully retrieved all properties",
                     Body = Body
                 };
-            }
-            catch (Exception ex)
-            {
-                return new ResponseBase<List<GetPropertyResponseModel>>
-                {
-                    Success = false,
-                    Message = ex.Message
-                };
-            }
         }
-        
-        
     }
 }

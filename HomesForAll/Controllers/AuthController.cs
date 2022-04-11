@@ -31,8 +31,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _authenticationService.Register(model);
             
-            if(result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
 
         }
 
@@ -48,8 +47,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _authenticationService.Login(model);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
 
         }
         /// <summary>
@@ -66,8 +64,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _authenticationService.RefreshToken(authorization, refreshToken);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -83,8 +80,7 @@ namespace HomesForAll.Controllers
         {
             var result = await _authenticationService.VerifyEmail(userId);
 
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return Ok(result);
         }
     }
 }

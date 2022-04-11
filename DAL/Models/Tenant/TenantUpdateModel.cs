@@ -15,5 +15,14 @@ namespace HomesForAll.DAL.Models.Tenant
         public string PhoneNumber { get; set; }
         [JsonProperty("BirthDate")]
         public DateTime BirthDate { get; set; }
+
+        public bool VerifyIntegrity()
+        {
+            if (this.Name == "" || this.Name == null)
+                return false;
+            if (this.PhoneNumber == "" || this.PhoneNumber == null)
+                return false;
+            return true;
+        }
     }
 }

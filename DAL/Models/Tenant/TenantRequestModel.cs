@@ -16,5 +16,16 @@ namespace HomesForAll.DAL.Models.Tenant
         public int NumberOfPeople { get; set; }
         [JsonProperty("Message")]
         public string Message { get; set; }
+        
+        public bool VerifyIntegrity()
+        {
+            if (PropertyId == null)
+                return false;
+            if (NumberOfPeople <= 0)
+                return false;
+            if (Message == "")
+                return false;
+            return true;
+        }
     }
 }

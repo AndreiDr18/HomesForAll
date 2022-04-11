@@ -9,6 +9,7 @@ using HomesForAll.DAL.UserRoles;
 using System.Text;
 using Serilog;
 using Microsoft.OpenApi.Models;
+using HomesForAll.Utils.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +89,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseExceptionManager();
 
 await RoleSeeder.InitRoles(app.Services.CreateScope());
 
