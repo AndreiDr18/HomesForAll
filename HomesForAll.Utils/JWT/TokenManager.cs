@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using HomesForAll.Utils.CustomExceptionUtil;
 
 namespace HomesForAll.Utils.JWT
 {
@@ -32,7 +33,7 @@ namespace HomesForAll.Utils.JWT
 
             if (AuthenticationHeaderValue.TryParse(authToken, out var header))
                 jwt = header.Parameter;
-            else throw new Exception("Couldn't parse authorization token from header");
+            else throw new CustomException(System.Net.HttpStatusCode.BadRequest,"Couldn't parse authorization token from header");
 
 
             var tokenJSON = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
@@ -61,7 +62,7 @@ namespace HomesForAll.Utils.JWT
 
             if (AuthenticationHeaderValue.TryParse(authToken, out var header))
                 jwt = header.Parameter;
-            else throw new Exception("Couldn't parse authorization token from header");
+            else throw new CustomException(System.Net.HttpStatusCode.BadRequest ,"Couldn't parse authorization token from header");
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(jwt, tokenValidationParameters, out SecurityToken securityToken);

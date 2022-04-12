@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HomesForAll.Utils.CustomExceptionUtil;
 using System.Net;
+using HomesForAll.Utils.ServerResponse.Models.TenantModels;
+using HomesForAll.Utils.Validators;
 
 namespace HomesForAll.Services.LandlordServices
 {
@@ -22,7 +24,7 @@ namespace HomesForAll.Services.LandlordServices
             _userManager = userManager;
         }
 
-        public async Task<ResponseBase<RegisterPropertyResponseModel>> RegisterProperty(RegisterPropertyModel model, string authToken)
+        public async Task<ResponseBase<EmptyResponseModel>> RegisterProperty(RegisterPropertyModel model, string authToken)
         {
             if (!model.VerifyIntegrity())
                 throw new CustomException(HttpStatusCode.BadRequest, "Invalid user input");
@@ -45,20 +47,18 @@ namespace HomesForAll.Services.LandlordServices
             if (changes == 0)
                 throw new CustomException(HttpStatusCode.InternalServerError,"Property did not get registered");
 
-            return new ResponseBase<RegisterPropertyResponseModel>
+            return new ResponseBase<EmptyResponseModel>
             {
                 Success = true,
-                Message = "Property succesfully registered",
-                Body = new RegisterPropertyResponseModel
-                {
-                    Name=propertyToAdd.Name
-                }
+                Message = "Property succesfully registered"
             };
 
         }
         public async Task<ResponseBase<EmptyResponseModel>> DeleteProperty(string propertyId, string authToken)
         {
-            #pragma warning disable CS8604
+            if (!GuidValidator.IsGuid(propertyId))
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid property id");
+#pragma warning disable CS8604
             var propertyToDelete = _dbContext.Properties
                                              .FirstOrDefault(p => p.Id == Guid.Parse(propertyId));
                 
@@ -81,59 +81,56 @@ namespace HomesForAll.Services.LandlordServices
                 Message = "Succesfully deleted the property"
             };
         }
-        public async Task<ResponseBase<List<GetTenantRequestResponseModel>>> GetRequests(string authToken)
+        public async Task<ResponseBase<List<GetOwnedPropertyResponseModel>>> GetProperties(string authToken)
         {
-            var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
+            var userId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
 
-            #pragma warning disable
-            var landlordProperties = await _dbContext.Properties
-                                                        .Include(p => p.TenantRequests).ThenInclude(p => p.Tenant)
-                                                        .Where(p => p.LandLordID == Guid.Parse(landlordId))
-                                                        .ToListAsync();
-            #pragma warning restore
-            if (landlordProperties.Count == 0)
-                return new ResponseBase<List<GetTenantRequestResponseModel>>
+            var user = _dbContext.Users
+                                 .Include(u => u.Properties).ThenInclude(p => p.AcceptedTenants)
+                                 .FirstOrDefault(u => u.Id == Guid.Parse(userId));
+
+            if ( user.Properties == null || user.Properties.Count == 0)
+                return new ResponseBase<List<GetOwnedPropertyResponseModel>>
                 {
-                    Success = true,
-                    Message = "Landlord has no registered properties"
+                    Success=true,
+                    Message = "User has no properties"
                 };
 
-            List<GetTenantRequestResponseModel> requests = new List<GetTenantRequestResponseModel>();
-            foreach(var property in landlordProperties)
+            var properties = new List<GetOwnedPropertyResponseModel>();
+
+            foreach (var property in user.Properties)
             {
-                if (property.TenantRequests == null) continue;
+                var acceptedTenants = new List<TenantResponseModel>();
+                foreach(var AcceptedTenant in property.AcceptedTenants)
+                {
+                    acceptedTenants.Add(new TenantResponseModel
+                    {
+                        Id = AcceptedTenant.Id,
+                        Name = AcceptedTenant.Name,
+                        PhoneNumber = AcceptedTenant.PhoneNumber,
+                        DateOfBirth = AcceptedTenant.BirthDate,
+                        JoinedAtDate = AcceptedTenant.JoinedAtDate
+                    });
+                }
+                properties.Add(new GetOwnedPropertyResponseModel
+                {
+                    Id = property.Id,
+                    Name = property.Name,
+                    Address = property.Address,
+                    AvailableSpaces = property.AvailableSpaces,
+                    AddedAt = property.AddedAt,
+                    AcceptedTenants = acceptedTenants
+                });
+                
 
-                foreach(var request in property.TenantRequests)
-                        requests.Add(new GetTenantRequestResponseModel
-                        {
-                            RequestID = request.Id,
-                            NumberOfPeople = request.NumberOfPeople,
-                            Message = request.Message,
-                            Status = request.Status.ToString(),
-                            Tenant = new TenantResponseModel
-                            {
-                                Id = request.Tenant.Id,
-                                Name = request.Tenant.Name,
-                                PhoneNumber = request.Tenant.PhoneNumber,
-                                DateOfBirth = request.Tenant.BirthDate
-                            },
-                            Property = new Utils.ServerResponse.Models.TenantModels.PropertyResponseModel
-                            {
-                                Id = property.Id,
-                                Name= property.Name,
-                                Address = property.Address,
-                                AvailableSpaces = property.AvailableSpaces,
-                                AddedAt = property.AddedAt
-                            }
 
-                                
-                        });
             }
-            return new ResponseBase<List<GetTenantRequestResponseModel>>
+
+            return new ResponseBase<List<GetOwnedPropertyResponseModel>>
             {
                 Success = true,
-                Message = "Sucesfully retrieved requests",
-                Body = requests
+                Message = "Sucesfully retrieved owned properties",
+                Body = properties
             };
         }
         public async Task<ResponseBase<GetLandlordResponseModel>> GetLandlord(string authToken)
@@ -165,6 +162,13 @@ namespace HomesForAll.Services.LandlordServices
             var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
             var landlord = await _userManager.FindByIdAsync(landlordId);
 
+            if (landlord.Name == model.Name && landlord.PhoneNumber == model.PhoneNumber && landlord.BirthDate == model.BirthDate)
+                return new ResponseBase<EmptyResponseModel>
+                {
+                    Success = true,
+                    Message = "No changes have been made"
+                };
+
             landlord.Name = model.Name;
             landlord.PhoneNumber = model.PhoneNumber;
             landlord.BirthDate = model.BirthDate;
@@ -182,6 +186,8 @@ namespace HomesForAll.Services.LandlordServices
         }
         public async Task<ResponseBase<EmptyResponseModel>> AcceptRequest(string requestId, string authToken)
         {
+            if (!GuidValidator.IsGuid(requestId))
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid request id");
 #pragma warning disable
             var tenantRequest = _dbContext.TenantRequests
                                             .Include(tr => tr.Property)
@@ -192,6 +198,8 @@ namespace HomesForAll.Services.LandlordServices
 
             if (tenantRequest == null)
                 throw new CustomException(HttpStatusCode.NotFound,"The request id is invalid");
+            if (tenantRequest.Status == Status.Rejected)
+                throw new CustomException(HttpStatusCode.BadRequest, "The request has already been rejected");
 
             var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
             if (tenantRequest.Status == Status.Accepted)
@@ -230,6 +238,8 @@ namespace HomesForAll.Services.LandlordServices
         }
         public async Task<ResponseBase<EmptyResponseModel>> RevokeRequest(string requestId, string authToken)
         {
+            if (!GuidValidator.IsGuid(requestId))
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid request id");
 #pragma warning disable
             var tenantRequest = _dbContext.TenantRequests
                                             .Include(tr => tr.Property)
@@ -246,7 +256,7 @@ namespace HomesForAll.Services.LandlordServices
             if(tenantRequest.Tenant.AcceptedAtPropertyID == tenantRequest.PropertyID)
                 throw new CustomException(HttpStatusCode.Forbidden,"Tenant has already been accepted, you must evict him instead.");
 
-            _dbContext.TenantRequests.Remove(tenantRequest);
+            tenantRequest.Status = Status.Rejected;
 
             var changes = await _dbContext.SaveChangesAsync();
             if (changes == 0)
@@ -259,7 +269,90 @@ namespace HomesForAll.Services.LandlordServices
             };
 
         }
-        
-        //Evict tenant
+        public async Task<ResponseBase<List<GetTenantRequestResponseModel>>> GetRequests(string authToken)
+        {
+            var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
+
+#pragma warning disable
+            var landlordProperties = await _dbContext.Properties
+                                                        .Include(p => p.TenantRequests).ThenInclude(p => p.Tenant)
+                                                        .Where(p => p.LandLordID == Guid.Parse(landlordId))
+                                                        .ToListAsync();
+#pragma warning restore
+            if (landlordProperties.Count == 0)
+                return new ResponseBase<List<GetTenantRequestResponseModel>>
+                {
+                    Success = true,
+                    Message = "Landlord has no registered properties"
+                };
+
+            List<GetTenantRequestResponseModel> requests = new List<GetTenantRequestResponseModel>();
+            foreach (var property in landlordProperties)
+            {
+                if (property.TenantRequests == null) continue;
+
+                foreach (var request in property.TenantRequests)
+                    requests.Add(new GetTenantRequestResponseModel
+                    {
+                        RequestID = request.Id,
+                        NumberOfPeople = request.NumberOfPeople,
+                        Message = request.Message,
+                        Status = request.Status.ToString(),
+                        Tenant = new TenantResponseModel
+                        {
+                            Id = request.Tenant.Id,
+                            Name = request.Tenant.Name,
+                            PhoneNumber = request.Tenant.PhoneNumber,
+                            DateOfBirth = request.Tenant.BirthDate
+                        },
+                        Property = new Utils.ServerResponse.Models.TenantModels.PropertyResponseModel
+                        {
+                            Id = property.Id,
+                            Name= property.Name,
+                            Address = property.Address,
+                            AvailableSpaces = property.AvailableSpaces,
+                            AddedAt = property.AddedAt
+                        }
+
+
+                    });
+            }
+            return new ResponseBase<List<GetTenantRequestResponseModel>>
+            {
+                Success = true,
+                Message = "Sucesfully retrieved requests",
+                Body = requests
+            };
+        }
+
+        public async Task<ResponseBase<EmptyResponseModel>> EvictTenant(string authToken, string tenantId)
+        {
+            if (!GuidValidator.IsGuid(tenantId))
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid tenant id");
+
+            var landlordId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
+
+            var tenantRequest = _dbContext.TenantRequests
+                                     .Include(tr => tr.Property).ThenInclude(p => p.AcceptedTenants)
+                                     .FirstOrDefault(tr => tr.TenantID == Guid.Parse(tenantId) && tr.Property.LandLordID == Guid.Parse(landlordId));
+            var tenant = _dbContext.Users.FirstOrDefault(u => u.Id == Guid.Parse(tenantId));
+
+            if (tenantRequest == null || tenant == null)
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid tenantId");
+
+            tenantRequest.Property.AcceptedTenants.Remove(tenant);
+            tenant.AcceptedAtProperty = null;
+            _dbContext.TenantRequests.Remove(tenantRequest);
+            var changes = await _dbContext.SaveChangesAsync();
+
+            if (changes == 0)
+                throw new CustomException(HttpStatusCode.InternalServerError, "Eviction request couldn't be completed due to a server error");
+
+            return new ResponseBase<EmptyResponseModel>
+            {
+                Success = true,
+                Message = "Tenant succesfully evicted"
+            };
+        }
     }
 }

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace HomesForAll.Utils.ServerResponse.Models.LandlordModels
 {
-    public class TenantResponseModel
+    public class GetOwnedPropertyResponseModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string PhoneNumber { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public DateTime JoinedAtDate { get; set; }
+        public string Address { get; set; }
+        public int AvailableSpaces { get; set; }
+        public DateTime AddedAt { get; set; }
+        public List<TenantResponseModel>? AcceptedTenants { get; set; }
+
     }
 }

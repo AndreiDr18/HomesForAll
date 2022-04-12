@@ -14,7 +14,7 @@ namespace HomesForAll.Utils.Mail
         {
             var apiKey = Environment.GetEnvironmentVariable("SENDGRIDAPIKEY");
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("dragneaionutandrei@gmail.com", "Dragnea Ionut Andrei");
+            var from = new EmailAddress("dragneaandrei2001@gmail.com", "Dragnea Ionut Andrei");
             var subject = "Email confirmation";
             var to = new EmailAddress(toMail, toName);
             var plainTextContext = $"Verify your email address here: https://localhost:7165/api/auth/verifyEmail/{userId.ToString()}";

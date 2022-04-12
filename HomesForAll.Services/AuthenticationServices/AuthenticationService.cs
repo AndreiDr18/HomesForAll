@@ -11,6 +11,7 @@ using HomesForAll.Utils.Mail;
 using Serilog;
 using HomesForAll.Utils.CustomExceptionUtil;
 using System.Net;
+using HomesForAll.Utils.Validators;
 
 namespace HomesForAll.Services.AuthenticationServices
 {
@@ -157,7 +158,9 @@ namespace HomesForAll.Services.AuthenticationServices
         }
         public async Task<ResponseBase<EmptyResponseModel>> VerifyEmail(string userId)
         {
-                
+            if (!GuidValidator.IsGuid(userId))
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid user id");
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 throw new CustomException(HttpStatusCode.BadRequest,"Invalid user id");

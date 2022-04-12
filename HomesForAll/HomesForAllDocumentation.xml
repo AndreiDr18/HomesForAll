@@ -45,6 +45,21 @@
             <param name="authorization"></param>
             <returns></returns>
         </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.DeleteProperty(System.String,System.String)">
+            <summary>
+                Delete a property
+            </summary>
+            <param name="propertyId"></param>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HomesForAll.Controllers.LandlordController.DeleteProperty(System.String)">
+            <summary>
+                Get owned properties
+            </summary>
+            <param name="authorization"></param>
+            <returns></returns>
+        </member>
         <member name="M:HomesForAll.Controllers.LandlordController.GetLandlord(System.String)">
             <summary>
                 Get user information about current landlord
@@ -76,11 +91,11 @@
             <param name="authorization"></param>
             <returns></returns>
         </member>
-        <member name="M:HomesForAll.Controllers.LandlordController.DeleteProperty(System.String,System.String)">
+        <member name="M:HomesForAll.Controllers.LandlordController.EvictTenant(System.String,System.String)">
             <summary>
-                Delete a property
+                Revoke tenancy request based on its id
             </summary>
-            <param name="propertyId"></param>
+            <param name="tenantId"></param>
             <param name="authorization"></param>
             <returns></returns>
         </member>

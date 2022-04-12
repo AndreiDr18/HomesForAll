@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HomesForAll.Utils.CustomExceptionUtil;
 using System.Net;
+using HomesForAll.Utils.Validators;
 
 namespace HomesForAll.Services.TenantServices
 {
@@ -120,7 +121,7 @@ namespace HomesForAll.Services.TenantServices
             var tenantId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
 
             var tenant = await _userManager.FindByIdAsync(tenantId);
-            var property = _dbContext.Properties.FirstOrDefault(p => p.Id == model.PropertyId);
+            var property = _dbContext.Properties.FirstOrDefault(p => p.Id == Guid.Parse(model.PropertyId));
 
 
             if (property == null)
@@ -141,7 +142,7 @@ namespace HomesForAll.Services.TenantServices
                 Message = model.Message,
                 Status = Status.Pending,
                 Property = property,
-                PropertyID = model.PropertyId,
+                PropertyID = Guid.Parse(model.PropertyId),
                 Tenant = tenant,
                 TenantID = Guid.Parse(tenantId)
             };
@@ -203,6 +204,8 @@ namespace HomesForAll.Services.TenantServices
         }
         public async Task<ResponseBase<EmptyResponseModel>> DeleteRequest(string authToken, string reqId)
         {
+            if (!GuidValidator.IsGuid(reqId))
+                throw new CustomException(HttpStatusCode.BadRequest, "Invalid request id");
             var tenantRequest = _dbContext.TenantRequests.Where(tr => tr.Id == Guid.Parse(reqId)).FirstOrDefault();
             var tenantId = TokenManager.ExtractHeaderValueJWT(authToken, "UserId");
 
@@ -212,6 +215,8 @@ namespace HomesForAll.Services.TenantServices
                 throw new CustomException(HttpStatusCode.Forbidden,"The request has already been accepted");
             if (tenantRequest.TenantID != Guid.Parse(tenantId))
                 throw new CustomException(HttpStatusCode.Forbidden,"You can only delete requests that are your own");
+            if (tenantRequest.Status == Status.Rejected)
+                throw new CustomException(HttpStatusCode.Forbidden, "The request has already been rejected");
 
             _dbContext.TenantRequests.Remove(tenantRequest);
             var changes = await _dbContext.SaveChangesAsync();

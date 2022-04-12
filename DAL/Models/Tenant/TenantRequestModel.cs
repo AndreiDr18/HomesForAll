@@ -11,7 +11,7 @@ namespace HomesForAll.DAL.Models.Tenant
     public class TenantRequestModel
     {
         [JsonProperty("PropertyId")]
-        public Guid PropertyId { get; set; }
+        public string PropertyId { get; set; }
         [JsonProperty("NumberOfPeople")]
         public int NumberOfPeople { get; set; }
         [JsonProperty("Message")]
@@ -19,7 +19,7 @@ namespace HomesForAll.DAL.Models.Tenant
         
         public bool VerifyIntegrity()
         {
-            if (PropertyId == null)
+            if (PropertyId == null || !Guid.TryParse(PropertyId, out var result))
                 return false;
             if (NumberOfPeople <= 0)
                 return false;
